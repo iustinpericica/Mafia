@@ -1,0 +1,50 @@
+.headtext{
+    position: absolute;
+    top:20%;
+    left:30%;
+    font-size: 600%;
+    animation-name: head;
+    animation-duration: 7s;
+    animation-iteration-count: infinite;
+    color:red;
+}
+
+#text2{
+    animation-delay: 3s;
+}
+
+@media(max-width:1000px){
+    .headtext{
+        position: absolute;
+        top:20%;
+        left:30%;
+        font-size: 300%;
+        animation-name: head1;
+        animation-duration: 7s;
+        animation-iteration-count: infinite;
+    }
+}
+
+@keyframes head1 {
+    0% {font-size:300%; opacity:1;}
+    50% {font-size:0; opacity:0;}
+    100% {font-size:300%;opacity:1;}
+}
+
+@keyframes head {
+    0% {font-size:600%; opacity:1;}
+    50% {font-size:0; opacity:0;}
+    100% {font-size:600%;opacity:1;}
+}
+
+#wrapper{
+    display: absolute;
+   
+}
+
+#btnPlay{
+    font-size:40px;
+    position: absolute;
+    top:400px;
+    left:40%;
+}
