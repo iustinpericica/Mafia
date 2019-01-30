@@ -1,3 +1,8 @@
-<p>
-  lobby works!
+
+
+<p *ngFor = "let player of gameService.players">{{player.name}}
+
+  <span style="color:red" *ngIf = "player.admin">Admin :D</span>
+  <button *ngIf = "gameService.myPlayer.admin">Make speaker</button>
+
 </p>

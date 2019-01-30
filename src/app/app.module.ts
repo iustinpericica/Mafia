@@ -10,6 +10,9 @@ import { GameComponent } from './game/game.component';
 import { GameService } from './game/game.service';
 import { CodeComponent } from './game/code.component';
 import { LobbyComponent } from './game/lobby.component';
+import {FormsModule} from '@angular/forms';
+import { ToastrService } from './features/toastr.service';
+import { LobbyGuard } from './features/lobby.guard';
 
 @NgModule({
   declarations: [
@@ -23,9 +26,10 @@ import { LobbyComponent } from './game/lobby.component';
   ],
   imports: [
     BrowserModule,
-    AppRoutingModule
+    AppRoutingModule,
+    FormsModule
   ],
-  providers: [GameService],
+  providers: [GameService, ToastrService,LobbyGuard],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

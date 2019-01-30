@@ -1,3 +1,22 @@
-<p>
-  code works!
-</p>
+<div *ngIf = "!gameService.name">
+
+    Would you mind telling your village your name?
+    <input type="text" #userName  />
+    <button (click) = "gameService.name = userName.value">Send my name</button>
+
+  </div>
+
+<div *ngIf = "gameService.name">
+    Your name is {{gameService.name}}
+</div>
+
+<div *ngIf = "gameService.name">
+
+  <p>Create new game: </p>
+  <input #createGame type="text" placeholder = "Your code" [disabled] = "gameService.code"/>
+  <button (click) = "gameService.createGame(createGame.value)" [disabled] = "gameService.code">Create game</button> <br /><br />
+
+  <input #enterGame type="text" placeholder = "Your code" [disabled] = "gameService.code"/>
+  <button (click) = "gameService.enterGame(enterGame.value)" [disabled] = "gameService.code" >Enter an already created game</button>
+
+</div>
