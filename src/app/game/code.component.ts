@@ -18,7 +18,6 @@ export class CodeComponent implements OnInit {
 
   ngOnInit() {
 
-    this.gameService.init();
 
     this.gameService.socket.componentClass = this;
 

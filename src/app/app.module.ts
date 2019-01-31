@@ -13,6 +13,10 @@ import { LobbyComponent } from './game/lobby.component';
 import {FormsModule} from '@angular/forms';
 import { ToastrService } from './features/toastr.service';
 import { LobbyGuard } from './features/lobby.guard';
+import { SelectionComponent } from './game/selection.component';
+import { SelectionService } from './game/selection.service';
+import { PickCardsComponent } from './game/pick-cards.component';
+import { PlayGameComponent } from './game/play-game.component';
 
 @NgModule({
   declarations: [
@@ -22,14 +26,17 @@ import { LobbyGuard } from './features/lobby.guard';
     PlayComponent,
     GameComponent,
     CodeComponent,
-    LobbyComponent
+    LobbyComponent,
+    SelectionComponent,
+    PickCardsComponent,
+    PlayGameComponent
   ],
   imports: [
     BrowserModule,
     AppRoutingModule,
     FormsModule
   ],
-  providers: [GameService, ToastrService,LobbyGuard],
+  providers: [GameService, ToastrService,LobbyGuard, SelectionService],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

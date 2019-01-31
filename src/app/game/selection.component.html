@@ -1,0 +1,48 @@
+<h2>There are {{playersNumber}} players, pick their rolls</h2>
+
+<h3>
+  Bystanders:
+</h3>
+  <input type="number" [(ngModel)] = "bystanders"  />
+  <p style="color:red" *ngIf = " bystanders + specialists + leaders + thugs + mobsters> playersNumber">Too many</p>
+  <br /><br />
+
+
+<h3>
+    Specialists:
+  </h3>
+    <input type="number" [(ngModel)] = "specialists"  />
+    <p style="color:red"*ngIf = "bystanders + specialists + leaders + thugs + mobsters > playersNumber">Too many</p>
+    <br /><br />
+    Specialists : {{specialists}}
+
+<h3>
+    Leaders:
+  </h3>
+    <input type="number" [(ngModel)] = "leaders"  />
+    <p style="color:red" *ngIf = "bystanders + specialists + leaders + thugs + mobsters > playersNumber">Too many</p>
+    <br /><br />
+
+<h3>
+    Thugs:
+  </h3>
+    <input type="number" [(ngModel)] = "thugs" />
+    <p style="color:red" *ngIf = "bystanders + specialists + leaders + thugs + mobsters > playersNumber">Too many</p>
+  <br /><br />
+
+<h3>
+    Mobsters:
+  </h3>
+  <input type="number"  [(ngModel)] = "mobsters"/>
+  <p style="color:red" *ngIf = "bystanders + specialists + leaders + thugs + mobsters > playersNumber">Too many</p>
+
+
+<h4>Recomanded mode: </h4>
+<p>Bystanders: {{myMode?.bystanders}}</p>
+<p>Specialists: {{myMode?.specialists}}</p>
+<p>Leaders: {{myMode?.leaders}}</p>
+<p>Thugs: {{myMode?.thugs}}</p>
+<p>Mobsters: {{myMode?.mobsters}}</p>
+<button class="btn btn-success" (click) = "applyDefault()">Apply it</button>
+
+<button class="btn btn-default" (click) = "pickCards()">Pick the cards</button>

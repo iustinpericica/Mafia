@@ -3,6 +3,18 @@
 <p *ngFor = "let player of gameService.players">{{player.name}}
 
   <span style="color:red" *ngIf = "player.admin">Admin :D</span>
-  <button *ngIf = "gameService.myPlayer.admin">Make speaker</button>
+  <button *ngIf = "gameService.myPlayer.admin && !gameService.myPlayer.speaker" (click) = "sendSpeaker(player.id)">Make speaker</button>
 
 </p>
+
+<h2>There are {{gameService.players.length}} players</h2>
+
+<div  *ngIf = "gameService.myPlayer.admin" >
+
+
+  <button (click) = "startSelection()">Start selection</button>
+
+</div>
+
+
+{{gameService.myPlayer | json}}

@@ -11,7 +11,22 @@ export class GameComponent implements OnInit {
   constructor(public gameService:GameService) { }
 
   ngOnInit() {
+    this.gameService.init();
 
+    this.gameService.socket.gameComponent = this;
+
+    this.gameService.socket.on('receiveCard', function(role){
+      console.log('Got it', role);
+      this.gameComponent.receiveRole(role);
+      //this.component.selectionService.gameService.router.navigate('/game/play');
+    });
+
+  }
+
+  receiveRole(role:string):void{
+    this.gameService.myPlayer.role = role;
+    console.log(this.gameService.myPlayer);
+    this.gameService.router.navigate(['/game/play']);
   }
 
 }
