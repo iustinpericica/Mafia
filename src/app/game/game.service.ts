@@ -18,7 +18,7 @@ export class GameService implements OnInit{
   public name:string = null;
   public players = [];
   public selectionStarted = false;
-
+  public roomIndex:number;
   public myCards = cards;
   public Deck;
 
@@ -31,7 +31,9 @@ export class GameService implements OnInit{
     admin:false,
     name:this.name,
     id:null,
-    role:null
+    role:null,
+    vectorId:null,
+    abilities:[]
 
   };
 

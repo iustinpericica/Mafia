@@ -1,4 +1,35 @@
-{{gameService.myPlayer | json}}
-<h2>Your name is : {{name}} </h2> <br />
-<h2>Your room code is : {{code}} </h2>
-<h2>Your role is : {{role}} </h2>
+<div *ngIf = "!myPlayer.speaker">
+
+  <h2>Your name is : {{name}} </h2> <br />
+  <h2>Your room code is : {{code}} </h2>
+  <h2>Your role is : {{role}} </h2>
+  <h2>Your vector id is: {{myPlayer.vectorId}}</h2>
+
+  <button [disabled] = "!onClickAbility" *ngFor = "let player of players" (click) = "sendAbility(player.id)">{{player.name}}</button>
+
+  <div *ngIf = "playGameService.myTurn">
+    <button *ngFor = "let i of playGameService.gameService.myPlayer?.abilities" (click) = "onClickAbility = true; abilityChosen = i">{{i}}</button>
+  </div>
+
+
+
+</div>
+
+<div *ngIf = "myPlayer.speaker">
+
+<div>
+
+    <h2>You are the speaker</h2>
+
+    <button (click) = "playGameService.callNextMove()">Next move</button>
+
+</div>
+
+
+<div>
+
+  <p *ngFor = "let player of players">Hi there {{player.name}}, role is: {{player.role}}</p>
+
+</div>
+
+</div>

@@ -1,16 +1,16 @@
-<div *ngIf = "!gameService.name">
+<div *ngIf = "!gameService.myPlayer.name">
 
     Would you mind telling your village your name?
     <input type="text" #userName  />
-    <button (click) = "gameService.myPlayer = userName.value">Send my name</button>
+    <button (click) = "gameService.myPlayer.name = userName.value">Send my name</button>
 
   </div>
 
-<div *ngIf = "gameService.name">
-    Your name is {{gameService.name}}
+<div *ngIf = "gameService.myPlayer.name">
+    Your name is {{gameService.myPlayer.name}}
 </div>
 
-<div *ngIf = "gameService.name">
+<div *ngIf = "gameService.myPlayer.name">
 
   <p>Create new game: </p>
   <input #createGame type="text" placeholder = "Your code" [disabled] = "gameService.code"/>

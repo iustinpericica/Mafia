@@ -17,7 +17,7 @@ export class LobbyComponent implements OnInit {
 
     this.gameService.socket.component = this;
 
-    this.gameService.socket.emit('requestPlayers', this.gameService.code);
+    this.gameService.socket.emit('requestPlayers', this.gameService.roomIndex);
 
     this.gameService.socket.on('requestedPlayers', function(players){
       this.component.gameService.players = players;
@@ -67,7 +67,7 @@ export class LobbyComponent implements OnInit {
   sendSpeaker(speakerId):void{
     this.gameService.socket.emit('makeSpeaker', {
       speakerId:speakerId,
-      code:this.gameService.code
+      index:this.gameService.roomIndex
     })
   }
 

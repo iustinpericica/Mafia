@@ -13,20 +13,48 @@ export class GameComponent implements OnInit {
   ngOnInit() {
     this.gameService.init();
 
-    this.gameService.socket.gameComponent = this;
+    this.gameService.socket.gameComponentMother = this;
 
-    this.gameService.socket.on('receiveCard', function(role){
-      console.log('Got it', role);
-      this.gameComponent.receiveRole(role);
+    this.gameService.socket.on('receiveCard', function(obiect){
+      // role, vectorId
+      this.gameComponentMother.receiveRole(obiect.role);
+
+      console.log(obiect.role);
+
+      switch(obiect.role){
+        case 'nurse':this.gameComponentMother.gameService.myPlayer.abilities = ['save'];break;
+        case 'bodyguard': this.gameComponentMother.gameService.myPlayer.abilities = ['protect'];break;
+        case 'thug' : this.gameComponentMother.gameService.myPlayer.abilities = ['kill'];break;
+        case 'jailer' : this.gameComponentMother.gameService.myPlayer.abilities = ['jail'];break;
+        case 'priest' : this.gameComponentMother.gameService.myPlayer.abilities = ['kill', 'investigate'];break;
+        case 'detective' : this.gameComponentMother.gameService.myPlayer.abilities = ['kill', 'investigate'];break;
+        case 'judge' : this.gameComponentMother.gameService.myPlayer.abilities = ['investigate'];break;
+        case 'sheriff' : this.gameComponentMother.gameService.myPlayer.abilities = ['kill'];break;
+        case 'vixen' : this.gameComponentMother.gameService.myPlayer.abilities = ['seduce'];break;
+        case 'hypnotist' : this.gameComponentMother.gameService.myPlayer.abilities = ['hypnotize'];break;
+        case 'journalist' : this.gameComponentMother.gameService.myPlayer.abilities = ['research'];break;
+        default: break;
+
+      }
+      this.gameComponentMother.gameService.myPlayer.vectorId = obiect.vectorId;
+
+    });
+
+    this.gameService.socket.on('gameBegan', function(){
+      this.gameComponentMother.goToGame();
       //this.component.selectionService.gameService.router.navigate('/game/play');
     });
 
   }
 
+  goToGame():void{
+    this.gameService.router.navigate(['/game/play']);
+  }
+
   receiveRole(role:string):void{
     this.gameService.myPlayer.role = role;
     console.log(this.gameService.myPlayer);
-    this.gameService.router.navigate(['/game/play']);
+
   }
 
 }

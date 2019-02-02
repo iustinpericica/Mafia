@@ -41,7 +41,7 @@ export class PickCardsComponent implements OnInit {
       this.selectionService.gameService.Deck = this.selectionService.Deck;
       //emitem la toti fraierii
 
-      this.selectionService.gameService.socket.emit('startGame', {code: this.selectionService.gameService.code, Deck:  this.selectionService.gameService.Deck});
+      this.selectionService.gameService.socket.emit('startGame', {index: this.selectionService.gameService.roomIndex, Deck:  this.selectionService.gameService.Deck});
 
   }
 

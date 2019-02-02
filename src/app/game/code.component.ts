@@ -31,7 +31,7 @@ export class CodeComponent implements OnInit {
       this.componentClass.setCode(user.code);
       this.componentClass.gameService.myPlayer.admin = true;
       this.componentClass.gameService.myPlayer.id = user.id;
-
+      this.componentClass.gameService.roomIndex = user.index;
 
       this.componentClass.toastrService.suceess(`You have created the room ${user.code} successful`);
       this.componentClass.router.navigate(['/game/lobby']);
@@ -44,7 +44,7 @@ export class CodeComponent implements OnInit {
       this.componentClass.toastrService.suceess(`You have entered the room ${user.code} successful`);
 
       this.componentClass.gameService.myPlayer.id = user.id
-
+      this.componentClass.gameService.roomIndex = user.index;
       console.log(this.componentClass.gameService.myPlayer);
 
       this.componentClass.router.navigate(['/game/lobby']);

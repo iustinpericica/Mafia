@@ -17,6 +17,7 @@ import { SelectionComponent } from './game/selection.component';
 import { SelectionService } from './game/selection.service';
 import { PickCardsComponent } from './game/pick-cards.component';
 import { PlayGameComponent } from './game/play-game.component';
+import { PlayGameService } from './game/playGame.service';
 
 @NgModule({
   declarations: [
@@ -36,7 +37,7 @@ import { PlayGameComponent } from './game/play-game.component';
     AppRoutingModule,
     FormsModule
   ],
-  providers: [GameService, ToastrService,LobbyGuard, SelectionService],
+  providers: [GameService, ToastrService,LobbyGuard, SelectionService, PlayGameService],
   bootstrap: [AppComponent]
 })
 export class AppModule { }
