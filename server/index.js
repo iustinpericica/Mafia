@@ -57,6 +57,7 @@ ServerIo.on('connection', function(socket){
         numberOrderNight:0, //night
         dawnDeck:{},
         mafiaDeck:[],
+        vote:{},
         Deck:{},
         rolesWithId:{},
         bystanders:[],
@@ -64,6 +65,7 @@ ServerIo.on('connection', function(socket){
         mafias:0,
         civilians:0,
         speaker:null,
+        voteStart:false,
         players:[{
 
           id:socket.id,
@@ -243,61 +245,150 @@ ServerIo.on('connection', function(socket){
 
   });
 
-  socket.on('newDawnAbility', function(index){
-    if(rooms[index].speaker == socket.id){
-        rooms[index].dawnDeck = {};
-    }
-  });
-
   socket.on('endNightCall', function(index){
     if(rooms[index].speaker == socket.id){
       for (let key in rooms[index].nightDeck) {
+        if(key != 0 && key != null && key != '0'){
         if (rooms[index].nightDeck.hasOwnProperty(key)) {
 
             let isSaved = false;
             let isSeduced = false;
             let isProtected = false;
             for(i of rooms[index].nightDeck[key]){
-              if(i == 'saved')isSaved = true;
-              if(i == 'seduced')isSeduced = true;
-              if(i == 'protected') isProtected = true;
 
-              if(!isSaved && !isSeduced && !isProtected && i == 'killed'){
-                let indexKilled = rooms[index].players.findIndex(x => x.id == key);
-                rooms[index].players[indexKilled].died = true;
-                ServerIo.to(rooms[index].code).emit('died', rooms[index].players[indexKilled].id);
 
-              }
+                if(i == 'saved')isSaved = true;
+                if(i == 'seduced')isSeduced = true;
+                if(i == 'protected') isProtected = true;
 
-              if(isProtected && i == 'killed' && !isSaved && !isSeduced ){
-                let idBodyguard = rooms[index].rolesWithId.bodyguard;
-                let indexKilled = rooms[index].players.findIndex(x => x.id == idBodyguard);
-                rooms[index].players[indexKilled].died = true;
-                ServerIo.to(rooms[index]).emit('died', rooms[index].players[indexKilled].id);
+                if(!isSaved && !isSeduced && !isProtected && i == 'killed'){
+                  let indexKilled = rooms[index].players.findIndex(x => x.id == key);
+                  console.log(rooms[index].players[indexKilled]);
+                  rooms[index].players[indexKilled].died = true;
+                  if(rooms[index].players[indexKilled].role == 'thug' || rooms[index].players[indexKilled].role == 'thief' || rooms[index].players[indexKilled].role == 'godfather' || rooms[index].players[indexKilled].role == 'lawyer' || rooms[index].players[indexKilled].role == 'snitch'){
+                    // e un mafeot
+                    rooms[index].mafias--;
+                  }
+                  else rooms[index].civilians--;
+                  ServerIo.to(rooms[index].code).emit('died', rooms[index].players[indexKilled].id);
 
-              }
+                }
+
+                if(isProtected && i == 'killed' && !isSaved && !isSeduced ){
+                  let idBodyguard = rooms[index].rolesWithId.bodyguard;
+                  let indexKilled = rooms[index].players.findIndex(x => x.id == idBodyguard);
+                  rooms[index].players[indexKilled].died = true;
+                  ServerIo.to(rooms[index].code).emit('died', rooms[index].players[indexKilled].id);
+
+                }
 
 
 
             }
 
-          }
+          }}
     }
+
+    if(rooms[index].mafias >= rooms[index].civilians){
+      ServerIo.to(rooms[index].code).emit('gameEndedMafia', rooms[index].players);
+
+    }
+    if(rooms[index].mafias == 0){ServerIo.to(rooms[index].code).emit('gameEndedCivilians', rooms[index].players);}
+    // end of the game  |^
 
     ServerIo.to(rooms[index].speaker).emit('nextRole', 'voteTimeStart');
 
     }
   });
 
+
   socket.on('voteTimeStartCall', function(index){
 
-    ServerIo.to(rooms[index].code).emit('voteTime');
+    rooms[index].vote = {};
+    rooms[index].voteStart = true;
+    for(i of rooms[index].players){
+      if(i.died == false){
+
+        ServerIo.to(i.id).emit('vote');
+
+      }
+    }
+
+    setTimeout(()=>{
+
+      rooms[index].voteStart = false;
+
+      let maxim = -1;
+      let maximSecond = false;
+      let maximId = null;
+
+      console.log('Obiect cu voturi: ', rooms[index].vote);
+
+      for(key in rooms[index].vote){
+
+        if(key != ''){
+
+        if(rooms[index].vote[key] > maxim){
+          maxim = rooms[index].vote[key];
+          maximId = key;
+          maximSecond = false;
+        }
+        else if(rooms[index].vote[key] == maxim){
+          maximSecond = true;
+
+        }
+
+      }
+      }
+
+      console.log(maximId);
+
+      if(!maximSecond){
+
+        console.log('Died fromm vote ..');
+        let indexKilled = rooms[index].players.findIndex(x => x.id == maximId);
+        rooms[index].players[indexKilled].died = true;
+        ServerIo.to(rooms[index].code).emit('died', rooms[index].players[indexKilled].id)
+
+      }
+      ServerIo.to(rooms[index].speaker).emit('nextRole', 'newNight');
+     rooms[index].mafiaDeck = [];
+     rooms[index].numberOrder = 0;
+     rooms[index].nightDeck = {};
+     rooms[index].vote = {};
+    }, 17000);
 
   });
 
+  socket.on('changeVote', function(obiect){
+    // vectorId, index, id
+    console.log('Changing vote..', obiect);
+    ServerIo.to(rooms[obiect.index].code).emit('changeVoteServer', obiect)
+
+  });
+
+  socket.on('votePlayer', function(obiect){
+    //index, //vectorId //playerVotedId
+
+    console.log("I'm votting ", obiect.playerVotedId);
+
+    if(rooms[obiect.index].voteStart){
+
+    if(rooms[obiect.index].players[obiect.vectorId].role == 'judge' || rooms[obiect.index].players[obiect.vectorId].role == 'hypnotist'){
+      if(!rooms[obiect.index].vote[obiect.playerVotedId])rooms[obiect.index].vote[obiect.playerVotedId] = 2;
+      else rooms[obiect.index].vote[obiect.playerVotedId]++;
+    }
+    else {
+      if(!rooms[obiect.index].vote[obiect.playerVotedId])rooms[obiect.index].vote[obiect.playerVotedId] = 1;
+      else rooms[obiect.index].vote[obiect.playerVotedId]++;
+    }
+
+  }
+  });
 
 
   socket.on('thugCall', function(index){
+
 
     rooms[index].mafiaDeck = [];
 
@@ -317,7 +408,7 @@ ServerIo.on('connection', function(socket){
   socket.on('mafiaAbility', function(obiect){
 
     let index = obiect.index;
-
+    console.log(obiect);
     rooms[index].mafiaDeck.push(obiect.idPlayerOnAbility);
     if(rooms[index].mafiaDeck.length === rooms[index].mafias){
 

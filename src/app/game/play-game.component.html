@@ -1,53 +1,70 @@
-<div *ngIf = "!myPlayer.speaker">
+<div *ngIf = "!mafiaWin && !civiliansWin">
+  <div *ngIf = "!myPlayer.speaker">
 
-  <h2>Your name is : {{name}} </h2> <br />
-  <h2>Your room code is : {{code}} </h2>
-  <h2>Your role is : {{role}} </h2>
-  <h2>Your vector id is: {{myPlayer.vectorId}}</h2>
-  <h3 *ngIf = "myPlayer.died" style="color:red">You are dead</h3>
+    <h2>Your name is : {{name}} </h2> <br />
+    <h2>Your room code is : {{code}} </h2>
+    <h2>Your role is : {{role}} </h2>
+    <h2>Your vector id is: {{myPlayer.vectorId}}</h2>
+    <h3 *ngIf = "myPlayer.died" style="color:red">You are dead</h3>
 
-  <p *ngFor = "let player of players">{{player.name}} <span *ngIf = "player.died" style="color:red">Died</span></p>
-  <div *ngIf = "!mafiaKillingStart">
+    <p *ngFor = "let player of players">{{player.name}} <span *ngIf = "player.died" style="color:red">Died</span> <button (click) = "changeVote(player.id, player.name)" *ngIf = "voteStarted">Vote</button></p>
 
-    <button [disabled] = "!onClickAbility" *ngFor = "let player of players" (click) = "sendAbility(player.id)">{{player.name}}</button>
+
+
+    <div *ngIf = "voteStarted">
+      <p *ngFor = "let i of playersVotes"><span *ngIf = "i.id != myPlayer.id"> {{i.name}} is trying to vote {{i.vote}} </span></p>
+    </div>
+
+    <div *ngIf = "voteStarted">
+      You are voting {{voteTargetName}}
+    </div>
+
+    <div *ngIf = "!mafiaKillingStart">
+
+      <button [disabled] = "!onClickAbility" *ngFor = "let player of players" (click) = "sendAbility(player.id)">{{player.name}}</button>
+
+    </div>
+
+
+    <div *ngIf = "mafiaKillingStart">
+
+        <button *ngFor = "let player of players" (click) = "mafiaKillingTarget = player.id">{{player.name}}</button>
+
+    </div>
+
+
+    <div *ngIf = "playGameService.myTurn && !mafiaKillingStart">
+      <button *ngFor = "let i of playGameService.gameService.myPlayer?.abilities" (click) = "onClickAbility = true; abilityChosen = i">{{i}}</button>
+    </div>
+
+    <div *ngIf = "mafiaKillingStart">
+        <h2 style="color:red">Kill</h2>
+    </div>
+
+
+
+  </div>
+
+  <div *ngIf = "myPlayer.speaker">
+
+  <div>
+
+      <h2>You are the speaker</h2>
+
+      <button (click) = "playGameService.callNextMove()">Next move</button>
 
   </div>
 
 
-  <div *ngIf = "mafiaKillingStart">
+  <div>
 
-      <button *ngFor = "let player of players" (click) = "mafiaKillingTarget = player.id">{{player.name}}</button>
+    <p *ngFor = "let player of players">Hi there {{player.name}}, role is: {{player.role}}</p>
 
   </div>
 
-
-  <div *ngIf = "playGameService.myTurn && !mafiaKillingStart">
-    <button *ngFor = "let i of playGameService.gameService.myPlayer?.abilities" (click) = "onClickAbility = true; abilityChosen = i">{{i}}</button>
   </div>
-
-  <div *ngIf = "mafiaKillingStart">
-      <h2 style="color:red">Kill</h2>
-  </div>
-
-
-
 </div>
 
-<div *ngIf = "myPlayer.speaker">
-
-<div>
-
-    <h2>You are the speaker</h2>
-
-    <button (click) = "playGameService.callNextMove()">Next move</button>
-
-</div>
-
-
-<div>
-
-  <p *ngFor = "let player of players">Hi there {{player.name}}, role is: {{player.role}}</p>
-
-</div>
-
+<div *ngIf="mafiaWin || civiliansWin">
+  <app-play-game-end-of-the-game [mafiaWon] = "mafiaWin" [civiliansWon] = "civiliansWin" [players] = "players"></app-play-game-end-of-the-game>
 </div>

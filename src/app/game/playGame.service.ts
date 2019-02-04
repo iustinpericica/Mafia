@@ -14,5 +14,15 @@ export class PlayGameService{
     this.gameService.socket.emit(this.nextMove + 'Call', this.gameService.roomIndex);
   }
 
+  votePlayer(id):void{
+    this.gameService.socket.emit('votePlayer' , {
+
+      index:this.gameService.roomIndex,
+      vectorId:this.gameService.myPlayer.vectorId,
+      playerVotedId:id
+
+    });
+  }
+
 
 }

@@ -21,7 +21,13 @@ export class PlayGameComponent implements OnInit {
   public onClickAbility:boolean = false;
   public abilityChosen:string = null;
   public mafiaKillingStart = false;
-  public mafiaKillingTarget = null;
+  public mafiaKillingTarget = 0;
+  public mafiaWin = false;
+  public civiliansWin = false;
+  public voteStarted = false;
+  public voteTarget = '';
+  public voteTargetName = '';
+  public playersVotes = [];
 
   ngOnInit() {
     this.name = this.playGameService.gameService.myPlayer.name;
@@ -31,6 +37,14 @@ export class PlayGameComponent implements OnInit {
     this.players =  this.playGameService.gameService.players;
     this.roomIndex = this.playGameService.gameService.roomIndex;
     this.playGameService.gameService.socket.gameComponent = this;
+
+    for(let i in this.players){
+
+      this.playersVotes[i] = {};
+      this.playersVotes[i].name = this.players[i].name;
+      this.playersVotes[i].id = this.players[i].id;
+
+    }
 
     if(this.myPlayer.speaker === true){
 
@@ -48,11 +62,35 @@ export class PlayGameComponent implements OnInit {
       this.playGameService.gameService.socket.on('nextRole', function(role){
 
         this.gameComponent.playGameService.nextMove = role;
-        console.log(role);
+
 
       });
 
     }
+
+    this.playGameService.gameService.socket.on('changeVoteServer', (obiect)=>{
+     // vectorId, index, id
+
+      this.playersVotes[obiect.vectorId].vote = obiect.name;
+      console.log('Players votes', this.playersVotes);
+
+    });
+
+    this.playGameService.gameService.socket.on('gameEndedMafia', (players) => {
+
+        this.players = players;
+
+        this.mafiaWin = true;
+
+    });
+
+    this.playGameService.gameService.socket.on('gameEndedCivilians', (players) => {
+
+      this.players = players;
+
+      this.civiliansWin = true;
+
+  });
 
     this.playGameService.gameService.socket.on('died', function(id){
 
@@ -60,9 +98,12 @@ export class PlayGameComponent implements OnInit {
 
     });
 
-    this.playGameService.gameService.socket.on('voteTime', function(){
-      console.log('voteTime');
-    })
+    this.playGameService.gameService.socket.on('vote', ()=>{
+
+      this.voteStarted = true;
+      this.beginTimeOutVote();
+
+    });
 
     this.playGameService.gameService.socket.on('yourTurn', function(){
 
@@ -90,14 +131,11 @@ export class PlayGameComponent implements OnInit {
 
   makeDead(id):void{
 
-    console.log('Dead');
-
     if(id == this.myPlayer.id){
       this.myPlayer.died = true;
     }
     else {
-      console.log('da');
-      console.log(this.players);
+
       for(let i in this.players){
           if(this.players[i].id == id){
             this.players[i].died = true;
@@ -107,6 +145,35 @@ export class PlayGameComponent implements OnInit {
     }
 
   }
+
+  changeVote(id, name):void{
+
+    this.voteTarget = id;
+    this.voteTargetName = name;
+    this.playGameService.gameService.socket.emit('changeVote', {
+
+      id: id,
+      index: this.roomIndex,
+      vectorId:this.myPlayer.vectorId,
+      name:name
+
+    });
+
+  }
+
+  beginTimeOutVote():void{
+
+    console.log('Beggining time out vote...');
+    if(!this.myPlayer.speaker){
+    setTimeout(()=>{
+      this.voteStarted = false;
+      this.playGameService.votePlayer(this.voteTarget);
+      this.voteTarget = '';
+      this.voteTargetName = '';
+
+    }, 15000);
+  }
+}
 
   startMafiaKilling():void{
     this.mafiaKillingStart = true;

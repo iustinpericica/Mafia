@@ -18,6 +18,7 @@ import { SelectionService } from './game/selection.service';
 import { PickCardsComponent } from './game/pick-cards.component';
 import { PlayGameComponent } from './game/play-game.component';
 import { PlayGameService } from './game/playGame.service';
+import { PlayGameEndOfTheGameComponent } from './game/play-game-end-of-the-game.component';
 
 @NgModule({
   declarations: [
@@ -30,7 +31,8 @@ import { PlayGameService } from './game/playGame.service';
     LobbyComponent,
     SelectionComponent,
     PickCardsComponent,
-    PlayGameComponent
+    PlayGameComponent,
+    PlayGameEndOfTheGameComponent
   ],
   imports: [
     BrowserModule,
