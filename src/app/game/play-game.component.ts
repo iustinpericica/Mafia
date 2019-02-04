@@ -19,7 +19,9 @@ export class PlayGameComponent implements OnInit {
   public rolesWithId;
   public roomIndex:number;
   public onClickAbility:boolean = false;
-  public abilityChosen:string;
+  public abilityChosen:string = null;
+  public mafiaKillingStart = false;
+  public mafiaKillingTarget = null;
 
   ngOnInit() {
     this.name = this.playGameService.gameService.myPlayer.name;
@@ -52,18 +54,76 @@ export class PlayGameComponent implements OnInit {
 
     }
 
+    this.playGameService.gameService.socket.on('died', function(id){
+
+      this.gameComponent.makeDead(id);
+
+    });
+
+    this.playGameService.gameService.socket.on('voteTime', function(){
+      console.log('voteTime');
+    })
+
     this.playGameService.gameService.socket.on('yourTurn', function(){
 
-      console.log('my turn..');
+
       this.gameComponent.playGameService.myTurn = true;
+      setTimeout(() => {
+        if(!this.gameComponent.abilityChosen){
+         this.gameComponent.abilityChosen = null;
+
+        this.gameComponent.sendAbility(0);
+        }
+      }, 7000);
     });
 
     this.playGameService.gameService.socket.on('nightArrived', function(){
       console.log('Winter is comming');
     });
 
+    this.playGameService.gameService.socket.on('mafiaKilling', function(){
+      this.gameComponent.startMafiaKilling();
+    });
 
 
+  }
+
+  makeDead(id):void{
+
+    console.log('Dead');
+
+    if(id == this.myPlayer.id){
+      this.myPlayer.died = true;
+    }
+    else {
+      console.log('da');
+      console.log(this.players);
+      for(let i in this.players){
+          if(this.players[i].id == id){
+            this.players[i].died = true;
+
+          }
+      }
+    }
+
+  }
+
+  startMafiaKilling():void{
+    this.mafiaKillingStart = true;
+    setTimeout(()=>{
+      this.mafiaKillingStart = false;
+
+        this.playGameService.gameService.socket.emit(`mafiaAbility`, {
+          index: this.playGameService.gameService.roomIndex,
+          indexRole: this.playGameService.gameService.myPlayer.vectorId,
+          idPlayerOnAbility: this.mafiaKillingTarget,
+          ability:this.abilityChosen
+        });
+
+        this.mafiaKillingTarget = null;
+        this.onClickAbility = false;
+
+    }, 7000);
 
   }
 
@@ -75,6 +135,7 @@ export class PlayGameComponent implements OnInit {
       ability:this.abilityChosen
     });
     this.playGameService.myTurn = false;
+    this.onClickAbility = false;
   }
 
 }

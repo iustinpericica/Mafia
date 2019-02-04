@@ -4,11 +4,29 @@
   <h2>Your room code is : {{code}} </h2>
   <h2>Your role is : {{role}} </h2>
   <h2>Your vector id is: {{myPlayer.vectorId}}</h2>
+  <h3 *ngIf = "myPlayer.died" style="color:red">You are dead</h3>
 
-  <button [disabled] = "!onClickAbility" *ngFor = "let player of players" (click) = "sendAbility(player.id)">{{player.name}}</button>
+  <p *ngFor = "let player of players">{{player.name}} <span *ngIf = "player.died" style="color:red">Died</span></p>
+  <div *ngIf = "!mafiaKillingStart">
 
-  <div *ngIf = "playGameService.myTurn">
+    <button [disabled] = "!onClickAbility" *ngFor = "let player of players" (click) = "sendAbility(player.id)">{{player.name}}</button>
+
+  </div>
+
+
+  <div *ngIf = "mafiaKillingStart">
+
+      <button *ngFor = "let player of players" (click) = "mafiaKillingTarget = player.id">{{player.name}}</button>
+
+  </div>
+
+
+  <div *ngIf = "playGameService.myTurn && !mafiaKillingStart">
     <button *ngFor = "let i of playGameService.gameService.myPlayer?.abilities" (click) = "onClickAbility = true; abilityChosen = i">{{i}}</button>
+  </div>
+
+  <div *ngIf = "mafiaKillingStart">
+      <h2 style="color:red">Kill</h2>
   </div>
 
 

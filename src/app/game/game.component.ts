@@ -32,7 +32,10 @@ export class GameComponent implements OnInit {
         case 'sheriff' : this.gameComponentMother.gameService.myPlayer.abilities = ['kill'];break;
         case 'vixen' : this.gameComponentMother.gameService.myPlayer.abilities = ['seduce'];break;
         case 'hypnotist' : this.gameComponentMother.gameService.myPlayer.abilities = ['hypnotize'];break;
-        case 'journalist' : this.gameComponentMother.gameService.myPlayer.abilities = ['research'];break;
+        case 'thief' : this.gameComponentMother.gameService.myPlayer.abilities = ['block'];break;
+        case 'godfather' : this.gameComponentMother.gameService.myPlayer.abilities = ['silence'];break;
+        case 'lawyer' : this.gameComponentMother.gameService.myPlayer.abilities = ['investigate'];break;
+        case 'snitch' : this.gameComponentMother.gameService.myPlayer.abilities = ['badmouth'];break;
         default: break;
 
       }
