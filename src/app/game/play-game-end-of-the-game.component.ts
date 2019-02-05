@@ -11,7 +11,8 @@ export class PlayGameEndOfTheGameComponent implements OnInit {
   @Input()players:string;
   @Input()mafiaWon:boolean;
   @Input()civiliansWon:boolean;
-
+  @Input() alivePlayers;
+  @Input() diedPlayers;
   constructor() { }
 
   ngOnInit() {

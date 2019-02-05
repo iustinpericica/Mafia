@@ -19,6 +19,11 @@ import { PickCardsComponent } from './game/pick-cards.component';
 import { PlayGameComponent } from './game/play-game.component';
 import { PlayGameService } from './game/playGame.service';
 import { PlayGameEndOfTheGameComponent } from './game/play-game-end-of-the-game.component';
+import { VoteComponent } from './game/playGameComponents/vote.component';
+import { SpeakerModeComponent } from './game/playGameComponents/speaker-mode.component';
+import { MafiaKillingComponent } from './game/playGameComponents/mafia-killing.component';
+import { MyTurnComponent } from './game/playGameComponents/my-turn.component';
+import { PlayerInfoComponent } from './game/playGameComponents/player-info.component';
 
 @NgModule({
   declarations: [
@@ -32,7 +37,12 @@ import { PlayGameEndOfTheGameComponent } from './game/play-game-end-of-the-game.
     SelectionComponent,
     PickCardsComponent,
     PlayGameComponent,
-    PlayGameEndOfTheGameComponent
+    PlayGameEndOfTheGameComponent,
+    VoteComponent,
+    SpeakerModeComponent,
+    MafiaKillingComponent,
+    MyTurnComponent,
+    PlayerInfoComponent
   ],
   imports: [
     BrowserModule,

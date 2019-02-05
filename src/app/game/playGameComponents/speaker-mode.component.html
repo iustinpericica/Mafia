@@ -1,0 +1,22 @@
+<div>
+
+    <h2>You are the speaker</h2>
+
+    <button (click) = "playGameService.callNextMove()">Next move</button>
+    <p> The next move is going to be: {{playGameService.nextMove}}</p>
+
+</div>
+
+
+<div>
+
+  <h2>All players:</h2>
+  <p *ngFor = "let player of speakerPlayers">{{player.name}}, role is: {{player.role}}</p>
+
+  <h2>Alive players:</h2>
+  <p *ngFor = "let player of alivePlayers">{{player.name}}</p>
+
+  <h2>Dead players</h2>
+  <p *ngFor = "let player of diedPlayers">{{player.name}}</p>
+
+</div>

@@ -1,6 +1,16 @@
 <h3 *ngIf = "mafiaWon">Mafia won</h3>
 <h3 *ngIf = "civiliansWon">CiviliansWon</h3>
 
-<p *ngFor = "let player of players">
-  {{player.name}} , Role: {{player.role}}
-</p>
+<div>
+
+    <h2>All players:</h2>
+    <p *ngFor = "let player of players">{{player.name}}, role is: {{player.role}}</p>
+
+    <h2>Alive players:</h2>
+    <p *ngFor = "let player of alivePlayers">{{player.name}}</p>
+
+    <h2>Dead players</h2>
+    <p *ngFor = "let player of diedPlayers">{{player.name}}</p>
+
+  </div>
+

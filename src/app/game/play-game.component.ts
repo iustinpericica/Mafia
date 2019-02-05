@@ -18,21 +18,20 @@ export class PlayGameComponent implements OnInit {
   public players;
   public rolesWithId;
   public roomIndex:number;
-  public onClickAbility:boolean = false;
-  public abilityChosen:string = null;
   public mafiaKillingStart = false;
-  public mafiaKillingTarget = 0;
   public mafiaWin = false;
   public civiliansWin = false;
   public voteStarted = false;
   public voteTarget = '';
   public voteTargetName = '';
   public playersVotes = [];
+  public alivePlayers = [];
+  public diedPlayers = [];
+  public speakerPlayers = [];
+  public myTurn:boolean = false;
 
   ngOnInit() {
-    this.name = this.playGameService.gameService.myPlayer.name;
     this.code = this.playGameService.gameService.code;
-    this.role = this.playGameService.gameService.myPlayer.role;
     this.myPlayer = this.playGameService.gameService.myPlayer;
     this.players =  this.playGameService.gameService.players;
     this.roomIndex = this.playGameService.gameService.roomIndex;
@@ -41,45 +40,54 @@ export class PlayGameComponent implements OnInit {
     for(let i in this.players){
 
       this.playersVotes[i] = {};
+
       this.playersVotes[i].name = this.players[i].name;
       this.playersVotes[i].id = this.players[i].id;
+      this.playersVotes[i].speaker = this.players[i].speaker;
+      this.playersVotes[i].died = false;
+
+      if(this.players[i].id !== this.myPlayer.id && !this.players[i].speaker){
+
+        this.alivePlayers.push({});
+
+        this.alivePlayers[this.alivePlayers.length - 1].id = this.players[i].id;
+        this.alivePlayers[this.alivePlayers.length - 1].name = this.players[i].name;
+
+
+      }
+
 
     }
+
+    console.log(this.alivePlayers);
 
     if(this.myPlayer.speaker === true){
 
 
       this.playGameService.gameService.socket.emit('needPlayersForSpeaker', this.roomIndex);
       this.playGameService.gameService.socket.on('playersForSpeaker', function(obiect){
-        console.log(obiect);
+
         this.gameComponent.playGameService.gameService.players = obiect.players;
         this.gameComponent.players = obiect.players;
-        //console.log(obiect.players;);
+
         this.rolesWithId = obiect.rolesWithId;
-        //console.log(this.rolesWithId);
-      });
 
-      this.playGameService.gameService.socket.on('nextRole', function(role){
 
-        this.gameComponent.playGameService.nextMove = role;
-
+        this.gameComponent.speakerPlayers = obiect.players;
 
       });
 
     }
 
     this.playGameService.gameService.socket.on('changeVoteServer', (obiect)=>{
-     // vectorId, index, id
 
       this.playersVotes[obiect.vectorId].vote = obiect.name;
-      console.log('Players votes', this.playersVotes);
 
     });
 
     this.playGameService.gameService.socket.on('gameEndedMafia', (players) => {
 
         this.players = players;
-
         this.mafiaWin = true;
 
     });
@@ -87,7 +95,6 @@ export class PlayGameComponent implements OnInit {
     this.playGameService.gameService.socket.on('gameEndedCivilians', (players) => {
 
       this.players = players;
-
       this.civiliansWin = true;
 
   });
@@ -105,25 +112,13 @@ export class PlayGameComponent implements OnInit {
 
     });
 
-    this.playGameService.gameService.socket.on('yourTurn', function(){
-
-
-      this.gameComponent.playGameService.myTurn = true;
-      setTimeout(() => {
-        if(!this.gameComponent.abilityChosen){
-         this.gameComponent.abilityChosen = null;
-
-        this.gameComponent.sendAbility(0);
-        }
-      }, 7000);
+    this.playGameService.gameService.socket.on('yourTurn', () =>{
+      this.myTurn = true;
     });
 
-    this.playGameService.gameService.socket.on('nightArrived', function(){
-      console.log('Winter is comming');
-    });
 
-    this.playGameService.gameService.socket.on('mafiaKilling', function(){
-      this.gameComponent.startMafiaKilling();
+    this.playGameService.gameService.socket.on('mafiaKilling', ()=>{
+      this.mafiaKillingStart = true;
     });
 
 
@@ -134,15 +129,27 @@ export class PlayGameComponent implements OnInit {
     if(id == this.myPlayer.id){
       this.myPlayer.died = true;
     }
-    else {
+
 
       for(let i in this.players){
           if(this.players[i].id == id){
             this.players[i].died = true;
+            this.playersVotes[i].died = true;
 
           }
       }
-    }
+
+      for(let i in this.alivePlayers){
+        if(this.alivePlayers[i].id == id){
+
+          this.diedPlayers.push(this.alivePlayers[i]);
+          this.alivePlayers.splice(+i, 1);
+
+
+        }
+      }
+
+
 
   }
 
@@ -175,34 +182,5 @@ export class PlayGameComponent implements OnInit {
   }
 }
 
-  startMafiaKilling():void{
-    this.mafiaKillingStart = true;
-    setTimeout(()=>{
-      this.mafiaKillingStart = false;
-
-        this.playGameService.gameService.socket.emit(`mafiaAbility`, {
-          index: this.playGameService.gameService.roomIndex,
-          indexRole: this.playGameService.gameService.myPlayer.vectorId,
-          idPlayerOnAbility: this.mafiaKillingTarget,
-          ability:this.abilityChosen
-        });
-
-        this.mafiaKillingTarget = null;
-        this.onClickAbility = false;
-
-    }, 7000);
-
-  }
-
-  sendAbility(id):void{
-    this.playGameService.gameService.socket.emit(`${this.playGameService.gameService.myPlayer.role}Ability`, {
-      index: this.playGameService.gameService.roomIndex,
-      indexRole: this.playGameService.gameService.myPlayer.vectorId,
-      idPlayerOnAbility: id,
-      ability:this.abilityChosen
-    });
-    this.playGameService.myTurn = false;
-    this.onClickAbility = false;
-  }
 
 }

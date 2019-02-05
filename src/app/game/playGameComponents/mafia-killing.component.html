@@ -1,0 +1,17 @@
+
+<button *ngFor = "let player of alivePlayers" (click) = "changeMafiaTarget(player.id, player.name)">{{player.name}}</button>
+
+<h2 style="color:red">Kill</h2>
+
+<p *ngFor = "let mafiot of mafias">
+
+  <span *ngIf = "mafiot.voteTo">
+    {{mafiot.name}} is voting to {{mafiot.voteTo}}
+  </span>
+
+</p>
+
+<p>You are voting to {{mafiaKillingTargetName}}</p>
+<p *ngIf = "counter == mafias?.length - 1">
+  Currently, all mafias are pointing to {{mafiaKillingTargetName}}
+</p>

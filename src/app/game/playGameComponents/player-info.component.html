@@ -1,0 +1,8 @@
+<h2>Your name is : {{myPlayer.name}} </h2>
+<h2>Your room code is : {{code}} </h2>
+<h2>Your role is : {{myPlayer.role}} </h2>
+<h2>Your vector id is: {{myPlayer.vectorId}}</h2>
+
+<h3 *ngIf = "myPlayer.died" style="color:red">You are dead</h3>
+
+<p *ngFor = "let player of alivePlayers">{{player.name}}</p>

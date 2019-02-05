@@ -8,6 +8,7 @@ let rooms = [];
 let order = ['newNight', 'vixen', 'thief', 'snitch', 'nurse', 'bodyguard', 'lawyer', 'thug', 'jailer', 'priest', 'detective', 'judge', 'sheriff', 'journalist', 'godfather', 'hypnotist', 'endNight', 'voteTimeStart', 'voteTimeEnd'];
 let numberOrder = order.length - 1;
 
+let mafias = ['thug', 'thief', 'godfather', 'lawyer', 'snitch'];
 
 let rolesWithEdAbilities = {
   jail:'jailed',
@@ -148,6 +149,7 @@ ServerIo.on('connection', function(socket){
 
       let index2 = rooms[obiect.index].players.findIndex((x) => x.id === obiect.speakerId); //iau indexul de la playerul din arrayul players din acel room
       rooms[obiect.index].players[index2].speaker = true;
+      rooms[obiect.index].players[index2].role = 'speaker';
 
       ServerIo.to(rooms[obiect.index].code).emit('speaker', obiect.speakerId); //returnez id ul speakerului
 
@@ -278,7 +280,8 @@ ServerIo.on('connection', function(socket){
                   let idBodyguard = rooms[index].rolesWithId.bodyguard;
                   let indexKilled = rooms[index].players.findIndex(x => x.id == idBodyguard);
                   rooms[index].players[indexKilled].died = true;
-                  ServerIo.to(rooms[index].code).emit('died', rooms[index].players[indexKilled].id);
+                  rooms[index].civilians--;
+                  ServerIo.to(rooms[index].code).emit('died', idBodyguard);
 
                 }
 
@@ -350,8 +353,22 @@ ServerIo.on('connection', function(socket){
         rooms[index].players[indexKilled].died = true;
         ServerIo.to(rooms[index].code).emit('died', rooms[index].players[indexKilled].id)
 
-      }
-      ServerIo.to(rooms[index].speaker).emit('nextRole', 'newNight');
+
+
+        if(rooms[index].players[indexKilled].role == 'thug' || rooms[index].players[indexKilled].role == 'thief' || rooms[index].players[indexKilled].role == 'godfather' || rooms[index].players[indexKilled].role == 'lawyer' || rooms[index].players[indexKilled].role == 'snitch'){
+          // e un mafeot
+          rooms[index].mafias--;
+        }
+        else rooms[index].civilians--;
+
+        if(rooms[index].mafias >= rooms[index].civilians){
+          ServerIo.to(rooms[index].code).emit('gameEndedMafia', rooms[index].players);
+
+        }
+        if(rooms[index].mafias == 0){ServerIo.to(rooms[index].code).emit('gameEndedCivilians', rooms[index].players);}
+
+    }
+     ServerIo.to(rooms[index].speaker).emit('nextRole', 'newNight');
      rooms[index].mafiaDeck = [];
      rooms[index].numberOrder = 0;
      rooms[index].nightDeck = {};
@@ -386,6 +403,13 @@ ServerIo.on('connection', function(socket){
   }
   });
 
+  socket.on('mafiasRequest', (index)=>{
+
+    let mafiasAlive = rooms[index].players.filter(x =>  (mafias.find(y => y == x.role) ) && !x.dead ) ;
+    console.log(mafiasAlive);
+    ServerIo.to(socket.id).emit('requestedMafias', mafiasAlive);
+
+  });
 
   socket.on('thugCall', function(index){
 
@@ -403,6 +427,45 @@ ServerIo.on('connection', function(socket){
       }
     }
 
+    setTimeout(()=>{
+
+          let mda =  false;
+
+          for(let i = 0;i<rooms[index].mafiaDeck.length - 1;++i){
+
+            if(rooms[index].mafiaDeck[i] !== rooms[index].mafiaDeck[i+1])mda = true;
+          }
+
+          if(!mda){
+
+
+            if(!rooms[index].nightDeck[rooms[index].mafiaDeck[0]]){
+              rooms[index].nightDeck[rooms[index].mafiaDeck[0]] = [rolesWithEdAbilities.kill]; //verific daca a fost format un array []
+            }
+            else rooms[index].nightDeck[rooms[index].mafiaDeck[0]].push(rolesWithEdAbilities.kill); // daca da pun push in el
+
+          }
+
+          rooms[index].numberOrderNight++;
+
+          while(!rooms[index].roles.find(x => x == order[rooms[index].numberOrderNight]) && rooms[index].numberOrderNight <= numberOrder)rooms[index].numberOrderNight++;
+
+          //ServerIo.to(rooms[index].rolesWithId[order[rooms[index].numberOrderNight]]).emit('yourTurn');
+
+          console.log(rooms[index].numberOrderNight);
+
+          if(rooms[index].numberOrderNight == 19){
+            console.log('Nght ended..');
+            console.log(rooms[index].nightDeck);
+            ServerIo.to(rooms[index].speaker).emit('nextRole', 'endNight');
+            return;
+          }
+
+          ServerIo.to(rooms[index].speaker).emit('nextRole', order[rooms[index].numberOrderNight]);
+
+
+    }, 15000);
+
   });
 
   socket.on('mafiaAbility', function(obiect){
@@ -410,46 +473,24 @@ ServerIo.on('connection', function(socket){
     let index = obiect.index;
     console.log(obiect);
     rooms[index].mafiaDeck.push(obiect.idPlayerOnAbility);
-    if(rooms[index].mafiaDeck.length === rooms[index].mafias){
 
+  });
 
+  socket.on('mafiaChangeTarget', (obiect)=>{
 
-        let mda =  false;
+    for(let player of rooms[obiect.index].players){
 
-        for(let i = 0;i<rooms[index].mafiaDeck.length - 1;++i){
+      if(mafias.find(x => x == player.role) && !player.dead && obiect.id != player.id){
+        ServerIo.to(player.id).emit('mafiaTargetChanged', obiect);
+      }
 
-          if(rooms[index].mafiaDeck[i] !== rooms[index].mafiaDeck[i+1])mda = true;
-        }
-
-        if(!mda){
-
-
-          if(!rooms[index].nightDeck[rooms[index].mafiaDeck[0]]){
-            rooms[index].nightDeck[rooms[index].mafiaDeck[0]] = [rolesWithEdAbilities.kill]; //verific daca a fost format un array []
-          }
-          else rooms[index].nightDeck[rooms[index].mafiaDeck[0]].push(rolesWithEdAbilities.kill); // daca da pun push in el
-
-        }
-
-        rooms[index].numberOrderNight++;
-    while(!rooms[obiect.index].roles.find(x => x == order[rooms[index].numberOrderNight]) && rooms[index].numberOrderNight <= numberOrder)rooms[index].numberOrderNight++;
-
-    //ServerIo.to(rooms[index].rolesWithId[order[rooms[index].numberOrderNight]]).emit('yourTurn');
-
-    console.log(rooms[index].numberOrderNight);
-
-    if(rooms[index].numberOrderNight == 19){
-      console.log('Nght ended..');
-      console.log(rooms[index].nightDeck);
-      ServerIo.to(rooms[obiect.index].speaker).emit('nextRole', 'endNight');
-      return;
-    }
-
-    ServerIo.to(rooms[obiect.index].speaker).emit('nextRole', order[rooms[index].numberOrderNight]);
+      if( obiect.id == player.id){
+        ServerIo.to(player.id).emit('mafiaTargetChanged', {
+          myPlayer:true
+        });
+      }
 
     }
-
-
 
   });
 
@@ -457,7 +498,7 @@ ServerIo.on('connection', function(socket){
 
   socket.on('nurseAbility', function(obiect){
 
-    addEventsAbility(obiect, 'nurse');
+    addEventsAbility(obiect, 'nurse', socket);
 
   });
 
@@ -474,7 +515,7 @@ ServerIo.on('connection', function(socket){
 
   socket.on('bodyguardAbility', function(obiect){
 
-    addEventsAbility(obiect, 'bodyguard');
+    addEventsAbility(obiect, 'bodyguard', socket);
 
   });
 
@@ -491,7 +532,7 @@ ServerIo.on('connection', function(socket){
 
   socket.on('vixenAbility', function(obiect){
 
-    addEventsAbility(obiect, 'vixen');
+    addEventsAbility(obiect, 'vixen', socket);
 
   });
 
@@ -508,7 +549,7 @@ ServerIo.on('connection', function(socket){
 
   socket.on('hypnotistAbility', function(obiect){
 
-    addEventsAbility(obiect, 'hypnotist');
+    addEventsAbility(obiect, 'hypnotist', socket);
 
   });
 
@@ -525,7 +566,7 @@ ServerIo.on('connection', function(socket){
 
   socket.on('journalistAbility', function(obiect){
 
-    addEventsAbility(obiect, 'journalist');
+    addEventsAbility(obiect, 'journalist', socket);
 
   });
 
@@ -544,7 +585,7 @@ ServerIo.on('connection', function(socket){
 
   socket.on('jailerAbility', function(obiect){
 
-    addEventsAbility(obiect, 'jailer');
+    addEventsAbility(obiect, 'jailer', socket);
 
   });
 
@@ -561,7 +602,7 @@ ServerIo.on('connection', function(socket){
 
   socket.on('priestAbility', function(obiect){
 
-    addEventsAbility(obiect, 'priest');
+    addEventsAbility(obiect, 'priest', socket);
 
   });
 
@@ -578,7 +619,7 @@ ServerIo.on('connection', function(socket){
 
   socket.on('detectiveAbility', function(obiect){
 
-    addEventsAbility(obiect, 'detective');
+    addEventsAbility(obiect, 'detective', socket);
 
   });
 
@@ -595,7 +636,7 @@ ServerIo.on('connection', function(socket){
 
   socket.on('judgeAbility', function(obiect){
 
-    addEventsAbility(obiect, 'judge');
+    addEventsAbility(obiect, 'judge', socket);
 
   });
 
@@ -612,7 +653,7 @@ ServerIo.on('connection', function(socket){
 
   socket.on('sheriffAbility', function(obiect){
 
-    addEventsAbility(obiect, 'sheriff');
+    addEventsAbility(obiect, 'sheriff', socket);
 
   });
 
@@ -632,7 +673,7 @@ ServerIo.on('connection', function(socket){
 
   socket.on('thiefAbility', function(obiect){
 
-    addEventsAbility(obiect, 'thief');
+    addEventsAbility(obiect, 'thief', socket);
 
   });
 
@@ -649,7 +690,7 @@ ServerIo.on('connection', function(socket){
 
   socket.on('godfatherAbility', function(obiect){
 
-    addEventsAbility(obiect, 'godfather');
+    addEventsAbility(obiect, 'godfather', socket);
 
   });
 
@@ -666,7 +707,7 @@ ServerIo.on('connection', function(socket){
 
   socket.on('lawyerAbility', function(obiect){
 
-    addEventsAbility(obiect, 'lawyer');
+    addEventsAbility(obiect, 'lawyer', socket);
 
   });
 
@@ -683,7 +724,7 @@ ServerIo.on('connection', function(socket){
 
   socket.on('snitchAbility', function(obiect){
 
-    addEventsAbility(obiect, 'snitch');
+    addEventsAbility(obiect, 'snitch', socket);
 
   });
 
@@ -727,10 +768,52 @@ ServerIo.on('connection', function(socket){
 
 });
 
-function addEventsAbility(obiect, role){
+function addEventsAbility(obiect, role, socket){
 
   let index = obiect.index;
   // index, indexRole idPlayerOnAbility
+
+  if(obiect.ability == 'investigate'){
+    let key = 0;
+    console.log('Investigating..');
+
+    for(i in rooms[index].rolesWithId){
+
+      if(rooms[index].rolesWithId[i] == obiect.idPlayerOnAbility){
+
+        ServerIo.to(socket.id).emit('investigatedPlayer', {
+
+          id : obiect.idPlayerOnAbility,
+          role: i
+
+        });
+      }
+    }
+
+    for(i of rooms[index].bystanders){
+      if(i == obiect.idPlayerOnAbility){
+        ServerIo.to(socket.id).emit('investigatedPlayer', {
+
+          id : obiect.idPlayerOnAbility,
+          role: 'bystander'
+
+        });
+      }
+    }
+
+    for(i of rooms[index].thugs){
+      if(i == obiect.idPlayerOnAbility){
+        ServerIo.to(socket.id).emit('investigatedPlayer', {
+
+          id : obiect.idPlayerOnAbility,
+          role: 'thug'
+
+        });
+      }
+    }
+
+
+  }
 
   if(rooms[index].players[obiect.indexRole].role === role && obiect.idPlayerOnAbility != 0){
 
