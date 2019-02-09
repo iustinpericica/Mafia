@@ -5,6 +5,8 @@ import { toASCII } from 'punycode';
 import { ToastrService } from '../features/toastr.service';
 import { Router } from '@angular/router';
 
+declare let $;
+
 @Component({
   selector: 'app-code',
   templateUrl: './code.component.html',
@@ -16,7 +18,30 @@ export class CodeComponent implements OnInit {
 
   public text:string;
 
+
+
   ngOnInit() {
+
+    function typeEffect(element, speed) {
+      var text = $(element).text();
+      $(element).html('');
+
+      var i = 0;
+      var timer = setInterval(function() {
+              if (i < text.length) {
+                $(element).append(text.charAt(i));
+                i++;
+              } else {
+                clearInterval(timer);
+              }
+            }, speed);
+    }
+
+    $( document ).ready(function() {
+      var speed = 75;
+      var delay = $('#firstText').text().length * speed + speed;
+      typeEffect($('#firstText'), speed);
+    });
 
 
     this.gameService.socket.componentClass = this;

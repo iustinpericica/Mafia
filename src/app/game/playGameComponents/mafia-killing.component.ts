@@ -1,5 +1,6 @@
 import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
 import { PlayGameService } from '../playGame.service';
+import { timer } from 'rxjs';
 
 
 @Component({
@@ -16,10 +17,17 @@ export class MafiaKillingComponent implements OnInit {
   public mafiaKillingTarget = 0;
   public mafiaKillingTargetName = '';
   public counter = 0;
-
+  public timer:number = 14;
   constructor(public playGameService:PlayGameService) { }
 
   ngOnInit() {
+
+    const numbers = timer(0, 1000);
+    numbers.subscribe(x => {
+      if(x > 14)x = 0;
+      this.timer = 14 - x;
+
+    });
 
     this.playGameService.gameService.socket.emit('mafiasRequest', this.playGameService.gameService.roomIndex);
 

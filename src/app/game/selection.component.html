@@ -1,48 +1,57 @@
-<h2>There are {{playersNumber}} players, pick their rolls</h2>
+<h2>There are {{playersNumber}} players who will play, pick their rolls</h2>
 
-<h3>
-  Bystanders:
-</h3>
-  <input type="number" [(ngModel)] = "bystanders"  />
-  <p style="color:red" *ngIf = " bystanders + specialists + leaders + thugs + mobsters> playersNumber">Too many</p>
-  <br /><br />
+<div *ngIf = "playersNumber >= 4">
+  <h4>Recomanded mode: </h4>
+  <p>Bystanders: {{myMode?.bystanders}}</p>
+  <p>Specialists: {{myMode?.specialists}}</p>
+  <p>Leaders: {{myMode?.leaders}}</p>
+  <p>Thugs: {{myMode?.thugs}}</p>
+  <p>Mobsters: {{myMode?.mobsters}}</p>
+</div>
 
-
-<h3>
-    Specialists:
-  </h3>
-    <input type="number" [(ngModel)] = "specialists"  />
-    <p style="color:red"*ngIf = "bystanders + specialists + leaders + thugs + mobsters > playersNumber">Too many</p>
-    <br /><br />
-    Specialists : {{specialists}}
-
-<h3>
-    Leaders:
-  </h3>
-    <input type="number" [(ngModel)] = "leaders"  />
-    <p style="color:red" *ngIf = "bystanders + specialists + leaders + thugs + mobsters > playersNumber">Too many</p>
-    <br /><br />
-
-<h3>
-    Thugs:
-  </h3>
-    <input type="number" [(ngModel)] = "thugs" />
-    <p style="color:red" *ngIf = "bystanders + specialists + leaders + thugs + mobsters > playersNumber">Too many</p>
-  <br /><br />
-
-<h3>
-    Mobsters:
-  </h3>
-  <input type="number"  [(ngModel)] = "mobsters"/>
-  <p style="color:red" *ngIf = "bystanders + specialists + leaders + thugs + mobsters > playersNumber">Too many</p>
+<button *ngIf = "playersNumber >= 4" class="btn btn-info" (click) = "applyDefault()">Apply it</button>
+<p class="text-info" *ngIf = "playersNumber < 4" >If there were more than 4 players, you would get access to default selections</p>
 
 
-<h4>Recomanded mode: </h4>
-<p>Bystanders: {{myMode?.bystanders}}</p>
-<p>Specialists: {{myMode?.specialists}}</p>
-<p>Leaders: {{myMode?.leaders}}</p>
-<p>Thugs: {{myMode?.thugs}}</p>
-<p>Mobsters: {{myMode?.mobsters}}</p>
-<button class="btn btn-success" (click) = "applyDefault()">Apply it</button>
+<button class="btn btn-outline-success" (click) = "pickCards()"  [disabled] = "mobsters == 0 && thugs == 0">Select the cards for the game</button>
 
-<button class="btn btn-default" (click) = "pickCards()">Pick the cards</button>
+<p *ngIf = "mobsters == 0 && thugs == 0" class="text-danger">There have to be at least one mafia player ( thug or mobster )</p>
+
+
+
+      <label style="width:100%">Bystanders</label>
+      <input class="form-control" type="number"   [(ngModel)] = "bystanders"  />
+
+
+    <p class="text-danger" *ngIf = " +bystanders + +specialists + +leaders + +thugs + +mobsters > +playersNumber && +bystanders > 0">Be sure to be {{playersNumber}} roles</p>
+
+
+      <label style="width:100%">Specialists</label>
+      <input class="form-control" type="number"  [(ngModel)] = "specialists"  />
+
+    <p class="text-danger" *ngIf = " +bystanders + +specialists + +leaders + +thugs + +mobsters > +playersNumber && specialists > 0" >Be sure to be {{playersNumber}} roles</p>
+
+
+
+    <label style="width:100%">Leaders</label>
+    <input class="form-control" type="number"  [(ngModel)] = "leaders"  />
+
+
+    <p class="text-danger"  *ngIf = " +bystanders + +specialists + +leaders + +thugs + +mobsters > +playersNumber && leaders > 0">Be sure to be {{playersNumber}} roles</p>
+
+
+
+    <label style="width:100%">Thugs</label>
+    <input class="form-control" type="number"  [(ngModel)] = "thugs"  />
+
+    <p class="text-danger"  *ngIf = " +bystanders + +specialists + +leaders + +thugs + +mobsters > +playersNumber && thugs > 0">Be sure to be {{playersNumber}} roles</p>
+
+
+
+
+    <label style="width:100%">Mobsters</label>
+    <input class="form-control" type="number"  [(ngModel)] = "mobsters"  />
+
+    <p class="text-danger"  *ngIf = " +bystanders + +specialists + +leaders + +thugs + +mobsters > +playersNumber && mobsters > 0">Be sure to be {{playersNumber}} roles</p>
+
+

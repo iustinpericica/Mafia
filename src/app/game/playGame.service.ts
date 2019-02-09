@@ -10,6 +10,13 @@ export class PlayGameService{
   nextMove:string = "newNight";
   myTurn:boolean = false;
 
+  public iAmSeduced:boolean = false;
+  public iAmBlocked:boolean = false;
+  public iAmSilenced:boolean = false;
+  public iAmJailed:boolean = false;
+  public iAmHypnotised:boolean = false;
+  public jailedPlayers: Array<string> = [];
+
   callNextMove(): void{
     this.gameService.socket.emit(this.nextMove + 'Call', this.gameService.roomIndex);
   }

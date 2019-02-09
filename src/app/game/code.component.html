@@ -1,22 +1,38 @@
-<div *ngIf = "!gameService.myPlayer.name">
+<div class="row center" style="align-content:center">
 
-    Would you mind telling your village your name?
-    <input type="text" #userName  />
-    <button (click) = "gameService.myPlayer.name = userName.value">Send my name</button>
+  <div *ngIf = "!gameService.myPlayer.name" style="width:100%;align-content: center;">
+
+      <div class="table container-fluid">
+          <div class="centeralign">
+            <h1 id="firstText">Please enter your name..</h1>
+          </div>
+      </div>
+
+      <div class="styled-input">
+          <input type="text" required #userName />
+          <label style="width:100%">Name</label>
+          <span></span>
+      </div>
+
+      <button type="button" (click) = "gameService.myPlayer.name = userName.value"  class="btn btn-outline-success btn-lg btn-block">Send my name</button>
+    </div>
+
+  <div *ngIf = "gameService.myPlayer.name" style="width:100%;">
+
+    <p style="width:100%;font-size: 8vw;text-align: center;">Hi there {{gameService.myPlayer.name}}</p>
+
+
+    <div class="styled-input">
+        <input type="text" required #createGame placeholder = "Your code" [disabled] = "gameService.code"/>
+        <label style="width:100%">Your code</label>
+        <span></span>
+    </div>
+
+    <button type="button" (click) = "gameService.createGame(createGame.value)" [disabled] = "gameService.code"  class="btn btn-outline-success btn-lg btn-block">Create new room</button>
+
+    <button type="button" (click) = "gameService.enterGame(createGame.value)" [disabled] = "gameService.code" class="btn btn-outline-success btn-lg btn-block">Enter an already created room</button>
 
   </div>
 
-<div *ngIf = "gameService.myPlayer.name">
-    Your name is {{gameService.myPlayer.name}}
-</div>
 
-<div *ngIf = "gameService.myPlayer.name">
 
-  <p>Create new game: </p>
-  <input #createGame type="text" placeholder = "Your code" [disabled] = "gameService.code"/>
-  <button (click) = "gameService.createGame(createGame.value)" [disabled] = "gameService.code">Create game</button> <br /><br />
-
-  <input #enterGame type="text" placeholder = "Your code" [disabled] = "gameService.code"/>
-  <button (click) = "gameService.enterGame(enterGame.value)" [disabled] = "gameService.code" >Enter an already created game</button>
-
-</div>

@@ -3,6 +3,25 @@ const App = Express();
 const Socket = require('socket.io');
 const Cors = require('cors');
 
+const PORT = process.env.PORT || 3000;
+
+App.use(Express.static(__dirname + '/Mafia'));
+
+App.get('/*', (req, res)=>{
+
+  res.sendFile(__dirname + '/Mafia/index.html');
+
+});
+
+const server = App.listen(PORT, (err)=>{
+  if(err)throw err;
+  else console.log('Socket.io is running perfectly just fine!');
+});
+
+
+
+const ServerIo = new Socket(server);
+
 let rooms = [];
 
 let order = ['newNight', 'vixen', 'thief', 'snitch', 'nurse', 'bodyguard', 'lawyer', 'thug', 'jailer', 'priest', 'detective', 'judge', 'sheriff', 'journalist', 'godfather', 'hypnotist', 'endNight', 'voteTimeStart', 'voteTimeEnd'];
@@ -17,7 +36,7 @@ let rolesWithEdAbilities = {
   save:'saved',
   protect:'protected',
   seduce:'seduced',
-  hypnotistst: 'hypnotized',
+  hypnotize: 'hypnotized',
   research:'researched',
   block:'blocked',
   silence:'silenced',
@@ -25,26 +44,16 @@ let rolesWithEdAbilities = {
 
 }
 
-App.use(Cors());
-
-App.get('/home', (req, res)=>{
-
-  res.sendFile(__dirname + '/index.html');
-
-});
-
-const server = App.listen(3000, (err)=>{
-  if(err)throw err;
-  else console.log('Socket.io is running perfectly just fine!');
-});
-
-const ServerIo = new Socket(server);
-
 ServerIo.on('connection', function(socket){
 
   socket.on('createGame', function(user){
 
-    if(!rooms.find((x) => x.code === user.code)){
+    if(!rooms.find((x) => {
+
+      if(!x)return false;
+      return x.code === user.code
+
+    })){
 
       let index = rooms.length;
 
@@ -58,6 +67,7 @@ ServerIo.on('connection', function(socket){
         numberOrderNight:0, //night
         dawnDeck:{},
         mafiaDeck:[],
+        jailedPlayers:[],
         vote:{},
         Deck:{},
         rolesWithId:{},
@@ -103,9 +113,18 @@ ServerIo.on('connection', function(socket){
     // user.code, user.name
 
 
-    if(rooms.find((x) => x.code === user.code)){
+    if(rooms.find((x) => {
+      if(!x)return 0;
+      return x.code === user.code;
 
-       let id = rooms.findIndex((x) => x.code === user.code);
+    })){
+
+       let id = rooms.findIndex((x) => {
+        if(!x)return 0;
+         return x.code === user.code
+        });
+
+        if(id !== undefined){
 
        rooms[id].players.push({
          id:socket.id,
@@ -124,6 +143,7 @@ ServerIo.on('connection', function(socket){
        ServerIo.to(user.code).emit('newUser', {id: socket.id, name : user.name});
 
       }
+    }
     else {
 
       ServerIo.to(socket.id).emit('wrongCode', user.code);
@@ -134,7 +154,11 @@ ServerIo.on('connection', function(socket){
 
   socket.on('requestPlayers', function(index){
 
-    ServerIo.to(socket.id).emit('requestedPlayers', rooms[index].players);
+    if(rooms[index] && rooms[index].players){
+
+      if(rooms[index].players.length > 0)ServerIo.to(socket.id).emit('requestedPlayers', rooms[index].players);
+
+    }
 
   });
 
@@ -142,6 +166,7 @@ ServerIo.on('connection', function(socket){
 
   socket.on('makeSpeaker', function(obiect){
     // speakerId, index in object
+    if(rooms[obiect.index]){
     if(rooms[obiect.index].admin === socket.id){
       // verific daca e admin si daca e codul corect
 
@@ -154,11 +179,12 @@ ServerIo.on('connection', function(socket){
       ServerIo.to(rooms[obiect.index].code).emit('speaker', obiect.speakerId); //returnez id ul speakerului
 
     }
-  });
+  }
+});
 
   socket.on('startGame', function(obiect){
     // obiect: index, Deck
-    console.log(obiect.Deck);
+    if(rooms[obiect.index]){
     if(rooms[obiect.index].admin === socket.id){
 
       rooms[obiect.index].gameStart = true;
@@ -201,8 +227,6 @@ ServerIo.on('connection', function(socket){
 
       let k = -1;
 
-      console.log(random);
-
       for(i in rooms[index].players){
         if(rooms[index].players[i].speaker == true){continue;}
         if(roles[random[k+1]] == 'thug' || roles[random[k+1]] ==  'thief' || roles[random[k+1]] ==  'godfather' || roles[random[k+1]] ==  'lawyer' || roles[random[k+1]] ==  'snitch' || roles[random[k+1]] == 'impostor') rooms[index].mafias++;
@@ -226,10 +250,12 @@ ServerIo.on('connection', function(socket){
       ServerIo.to(rooms[obiect.index].code).emit('gameBegan');
 
       }
+    }
   });
 
   socket.on('newNightCall', function(index){
 
+    if(rooms[index]){
     if(rooms[index].speaker === socket.id){
 
       //console.log('da');
@@ -241,16 +267,19 @@ ServerIo.on('connection', function(socket){
 
       while(!rooms[index].roles.find(x => x == order[rooms[index].numberOrderNight]))rooms[index].numberOrderNight++;
 
-      ServerIo.to(rooms[index].speaker).emit('nextRole', order[rooms[index].numberOrderNight])
+      ServerIo.to(rooms[index].speaker).emit('nextRole', order[rooms[index].numberOrderNight]);
 
     }
+  }
 
   });
 
   socket.on('endNightCall', function(index){
+    if(rooms[index]){
     if(rooms[index].speaker == socket.id){
+      try{
       for (let key in rooms[index].nightDeck) {
-        if(key != 0 && key != null && key != '0'){
+        if(key != 0 && key != null && key != '0' && key){
         if (rooms[index].nightDeck.hasOwnProperty(key)) {
 
             let isSaved = false;
@@ -265,13 +294,13 @@ ServerIo.on('connection', function(socket){
 
                 if(!isSaved && !isSeduced && !isProtected && i == 'killed'){
                   let indexKilled = rooms[index].players.findIndex(x => x.id == key);
-                  console.log(rooms[index].players[indexKilled]);
                   rooms[index].players[indexKilled].died = true;
                   if(rooms[index].players[indexKilled].role == 'thug' || rooms[index].players[indexKilled].role == 'thief' || rooms[index].players[indexKilled].role == 'godfather' || rooms[index].players[indexKilled].role == 'lawyer' || rooms[index].players[indexKilled].role == 'snitch'){
                     // e un mafeot
                     rooms[index].mafias--;
                   }
                   else rooms[index].civilians--;
+                  if(rooms[index].players[indexKilled].role == 'jailer')ServerIo.to(rooms[index].code).emit('freeJailedPlayers');
                   ServerIo.to(rooms[index].code).emit('died', rooms[index].players[indexKilled].id);
 
                 }
@@ -290,22 +319,39 @@ ServerIo.on('connection', function(socket){
             }
 
           }}
-    }
+        }
+
+
+
+
+    let gameEnd = false;
 
     if(rooms[index].mafias >= rooms[index].civilians){
       ServerIo.to(rooms[index].code).emit('gameEndedMafia', rooms[index].players);
+      gameEnd = true;
+      delete rooms[index];
+      return;
 
     }
-    if(rooms[index].mafias == 0){ServerIo.to(rooms[index].code).emit('gameEndedCivilians', rooms[index].players);}
+    if(rooms[index].mafias == 0){
+      ServerIo.to(rooms[index].code).emit('gameEndedCivilians', rooms[index].players);
+      gameEnd = true;
+      delete rooms[index];
+      return;
+    }
     // end of the game  |^
 
-    ServerIo.to(rooms[index].speaker).emit('nextRole', 'voteTimeStart');
+    if(!gameEnd)ServerIo.to(rooms[index].speaker).emit('nextRole', 'voteTimeStart');
 
     }
-  });
+    catch(err){}
+  }
+}});
 
 
   socket.on('voteTimeStartCall', function(index){
+
+    if(rooms[index]){
 
     rooms[index].vote = {};
     rooms[index].voteStart = true;
@@ -325,32 +371,34 @@ ServerIo.on('connection', function(socket){
       let maximSecond = false;
       let maximId = null;
 
-      console.log('Obiect cu voturi: ', rooms[index].vote);
+      //console.log('Obiect cu voturi: ', rooms[index].vote);
 
       for(key in rooms[index].vote){
 
         if(key != ''){
 
-        if(rooms[index].vote[key] > maxim){
-          maxim = rooms[index].vote[key];
-          maximId = key;
-          maximSecond = false;
+        if(rooms[index].vote[key]){
+          if(rooms[index].vote[key] > maxim){
+            maxim = rooms[index].vote[key];
+            maximId = key;
+            maximSecond = false;
         }
+
         else if(rooms[index].vote[key] == maxim){
           maximSecond = true;
 
         }
 
+      }}
       }
-      }
 
-      console.log(maximId);
 
-      if(!maximSecond){
+      if(!maximSecond && maxim != -1){
 
-        console.log('Died fromm vote ..');
         let indexKilled = rooms[index].players.findIndex(x => x.id == maximId);
         rooms[index].players[indexKilled].died = true;
+        if(rooms[index].players[indexKilled].role == 'jailer')ServerIo.to(rooms[index].code).emit('freeJailedPlayers');
+
         ServerIo.to(rooms[index].code).emit('died', rooms[index].players[indexKilled].id)
 
 
@@ -375,108 +423,133 @@ ServerIo.on('connection', function(socket){
      rooms[index].vote = {};
     }, 17000);
 
-  });
+  }
+});
 
   socket.on('changeVote', function(obiect){
-    // vectorId, index, id
-    console.log('Changing vote..', obiect);
-    ServerIo.to(rooms[obiect.index].code).emit('changeVoteServer', obiect)
+
+    if(rooms[obiect.index])ServerIo.to(rooms[obiect.index].code).emit('changeVoteServer', obiect)
 
   });
 
   socket.on('votePlayer', function(obiect){
     //index, //vectorId //playerVotedId
 
-    console.log("I'm votting ", obiect.playerVotedId);
-
+    if(rooms[obiect.index]){
     if(rooms[obiect.index].voteStart){
 
-    if(rooms[obiect.index].players[obiect.vectorId].role == 'judge' || rooms[obiect.index].players[obiect.vectorId].role == 'hypnotist'){
-      if(!rooms[obiect.index].vote[obiect.playerVotedId])rooms[obiect.index].vote[obiect.playerVotedId] = 2;
-      else rooms[obiect.index].vote[obiect.playerVotedId]++;
-    }
-    else {
-      if(!rooms[obiect.index].vote[obiect.playerVotedId])rooms[obiect.index].vote[obiect.playerVotedId] = 1;
-      else rooms[obiect.index].vote[obiect.playerVotedId]++;
-    }
 
-  }
-  });
+      let possibleJudge = rooms[obiect.index].nightDeck[rooms[obiect.index].rolesWithId.judge];
+
+      if(possibleJudge)possibleJudge = possibleJudge.find(x => x == 'hypnotized');
+      if(rooms[obiect.index].players[obiect.vectorId].role == 'judge'){
+        if(!rooms[obiect.index].vote[obiect.playerVotedId]){
+          rooms[obiect.index].vote[obiect.playerVotedId] = 2;
+        }
+        else rooms[obiect.index].vote[obiect.playerVotedId]+=2;
+      }
+
+      else if(rooms[obiect.index].players[obiect.vectorId].role == 'hypnotist'){
+          if(!rooms[obiect.index].vote[obiect.playerVotedId]){
+            if(possibleJudge) rooms[obiect.index].vote[obiect.playerVotedId] = 3;
+            else rooms[obiect.index].vote[obiect.playerVotedId] = 2;
+          }
+          else {
+            if(possibleJudge) rooms[obiect.index].vote[obiect.playerVotedId]+=3;
+            else rooms[obiect.index].vote[obiect.playerVotedId]+=2;
+          }
+        }
+          else {
+            if(!rooms[obiect.index].vote[obiect.playerVotedId]){
+              rooms[obiect.index].vote[obiect.playerVotedId] = 1;
+            }
+            else rooms[obiect.index].vote[obiect.playerVotedId]++;
+          }
+
+
+}
+}});
 
   socket.on('mafiasRequest', (index)=>{
 
-    let mafiasAlive = rooms[index].players.filter(x =>  (mafias.find(y => y == x.role) ) && !x.dead ) ;
-    console.log(mafiasAlive);
-    ServerIo.to(socket.id).emit('requestedMafias', mafiasAlive);
+    if(rooms[index]){
+
+      let mafiasAlive = rooms[index].players.filter(x =>  (mafias.find(y => y == x.role) ) && !x.dead ) ;
+      ServerIo.to(socket.id).emit('requestedMafias', mafiasAlive);
+
+    }
 
   });
 
   socket.on('thugCall', function(index){
 
+    if(rooms[index]){
+      rooms[index].mafiaDeck = [];
 
-    rooms[index].mafiaDeck = [];
-
-    if(rooms[index].speaker == socket.id){
-      for(i of rooms[index].thugs){
-        ServerIo.to(i).emit('mafiaKilling');
+      if(rooms[index].speaker == socket.id){
+        for(i of rooms[index].thugs){
+          ServerIo.to(i).emit('mafiaKilling');
+        }
       }
-    }
-    for(i of rooms[index].roles){
-      if(i == 'thief' || i == 'godfather' || i == 'lawyer' || i == 'snitch'){
-        ServerIo.to(rooms[index].rolesWithId[i]).emit('mafiaKilling');
+      for(i of rooms[index].roles){
+        if(i == 'thief' || i == 'godfather' || i == 'lawyer' || i == 'snitch'){
+          ServerIo.to(rooms[index].rolesWithId[i]).emit('mafiaKilling');
+        }
       }
-    }
 
-    setTimeout(()=>{
+      setTimeout(()=>{
 
-          let mda =  false;
+            let mda =  false;
 
-          for(let i = 0;i<rooms[index].mafiaDeck.length - 1;++i){
+            for(let i = 0;i<rooms[index].mafiaDeck.length - 1;++i){
 
-            if(rooms[index].mafiaDeck[i] !== rooms[index].mafiaDeck[i+1])mda = true;
-          }
-
-          if(!mda){
-
-
-            if(!rooms[index].nightDeck[rooms[index].mafiaDeck[0]]){
-              rooms[index].nightDeck[rooms[index].mafiaDeck[0]] = [rolesWithEdAbilities.kill]; //verific daca a fost format un array []
+              if(rooms[index].mafiaDeck[i] !== rooms[index].mafiaDeck[i+1])mda = true;
             }
-            else rooms[index].nightDeck[rooms[index].mafiaDeck[0]].push(rolesWithEdAbilities.kill); // daca da pun push in el
 
-          }
-
-          rooms[index].numberOrderNight++;
-
-          while(!rooms[index].roles.find(x => x == order[rooms[index].numberOrderNight]) && rooms[index].numberOrderNight <= numberOrder)rooms[index].numberOrderNight++;
-
-          //ServerIo.to(rooms[index].rolesWithId[order[rooms[index].numberOrderNight]]).emit('yourTurn');
-
-          console.log(rooms[index].numberOrderNight);
-
-          if(rooms[index].numberOrderNight == 19){
-            console.log('Nght ended..');
-            console.log(rooms[index].nightDeck);
-            ServerIo.to(rooms[index].speaker).emit('nextRole', 'endNight');
-            return;
-          }
-
-          ServerIo.to(rooms[index].speaker).emit('nextRole', order[rooms[index].numberOrderNight]);
+            if(!mda){
 
 
-    }, 15000);
+              if(!rooms[index].nightDeck[rooms[index].mafiaDeck[0]]){
+                rooms[index].nightDeck[rooms[index].mafiaDeck[0]] = [rolesWithEdAbilities.kill]; //verific daca a fost format un array []
+              }
+              else rooms[index].nightDeck[rooms[index].mafiaDeck[0]].push(rolesWithEdAbilities.kill); // daca da pun push in el
 
-  });
+            }
+
+            rooms[index].numberOrderNight++;
+
+            while(!rooms[index].roles.find(x => x == order[rooms[index].numberOrderNight]) && rooms[index].numberOrderNight <= numberOrder)rooms[index].numberOrderNight++;
+
+            //ServerIo.to(rooms[index].rolesWithId[order[rooms[index].numberOrderNight]]).emit('yourTurn');
+
+            console.log(rooms[index].numberOrderNight);
+
+            if(rooms[index].numberOrderNight == 19){
+              console.log('Nght ended..');
+              console.log(rooms[index].nightDeck);
+              ServerIo.to(rooms[index].speaker).emit('nextRole', 'endNight');
+              return;
+            }
+
+            ServerIo.to(rooms[index].speaker).emit('nextRole', order[rooms[index].numberOrderNight]);
+
+
+      }, 15000);
+
+  }
+});
 
   socket.on('mafiaAbility', function(obiect){
 
     let index = obiect.index;
-    console.log(obiect);
-    rooms[index].mafiaDeck.push(obiect.idPlayerOnAbility);
+    if(rooms[index])rooms[index].mafiaDeck.push(obiect.idPlayerOnAbility);
 
   });
 
   socket.on('mafiaChangeTarget', (obiect)=>{
+    if(rooms[obiect.index]){
+
+      if(rooms[obiect.index].players){
 
     for(let player of rooms[obiect.index].players){
 
@@ -492,7 +565,8 @@ ServerIo.on('connection', function(socket){
 
     }
 
-  });
+  }
+}});
 
   // ---- NURSE  ----
 
@@ -737,34 +811,40 @@ ServerIo.on('connection', function(socket){
     }
   });
 
-  socket.on('nextRole', function(code){
+  socket.on('nextRole', function(index){
 
-    if(rooms.find(x => (x.speaker === socket.id && x.code === code))){
 
-      let index = rooms.findIndex((x) => (x.speaker === socket.id && x.code === code)); //indexul de la admin din array
 
+    if(rooms[index]){
+
+      if(rooms[index].speaker == socket.id){
+
+      rooms[index].numberOrderNight++;
       while(!rooms[index].roles.find(x => x == order[rooms[index].numberOrderNight]))rooms[index].numberOrderNight++;
 
       ServerIo.to(rooms[index].rolesWithId[order[rooms[index].numberOrderNight]]).emit('yourTurn');
 
     }
+  }
 
   });
 
   socket.on('needPlayersForSpeaker', function(index){
-    if(rooms[index].speaker === socket.id){
-      let rolesWithId = rooms[index].rolesWithId;
-      let arr = [1, 2, 3];
-      ServerIo.to(socket.id).emit('playersForSpeaker', {players: rooms[index].players,
-                                                        thugs: rooms[index].thugs,
-                                                        bystanders: rooms[index].bystanders,
-                                                        rolesWithId: rooms[index].rolesWithId,
-                                                        roles:rooms[index].roles
-                                                      } );
+    if(rooms[index]){
+      if(rooms[index].speaker === socket.id){
+        let rolesWithId = rooms[index].rolesWithId;
+        let arr = [1, 2, 3];
+        ServerIo.to(socket.id).emit('playersForSpeaker', {players: rooms[index].players,
+                                                          thugs: rooms[index].thugs,
+                                                          bystanders: rooms[index].bystanders,
+                                                          rolesWithId: rooms[index].rolesWithId,
+                                                          roles:rooms[index].roles
+                                                        } );
 
-    }
+      }
 
-  })
+  }
+})
 
 });
 
@@ -772,14 +852,59 @@ function addEventsAbility(obiect, role, socket){
 
   let index = obiect.index;
   // index, indexRole idPlayerOnAbility
+  if(rooms[index]){
+    if(rooms[index].players){
+      try{
+  let name = rooms[index].players.find(x => x.id == obiect.idPlayerOnAbility);
+  if(name)name = name.name;
 
   if(obiect.ability == 'investigate'){
     let key = 0;
     console.log('Investigating..');
 
-    for(i in rooms[index].rolesWithId){
+
+    if(rooms[index].players[obiect.indexRole].role === role && obiect.idPlayerOnAbility != 0){
+
+      if(role == 'priest'){
+        ServerIo.to(obiect.idPlayerOnAbility).emit('investigatedByPriest', rooms[index].players[obiect.indexRole].name);
+      }
+
+      let foundBadmouth = false;
+
+      if(rooms[index].nightDeck[obiect.idPlayerOnAbility]){
+
+        if(rooms[index].nightDeck[obiect.idPlayerOnAbility].find(x => x == 'badmouthed')){
+        foundBadmouth = true;
+
+      }
+    }
+
+      if(foundBadmouth){
+        if(role == 'jailer'){
+          ServerIo.to(rooms[index].code).emit('newJailedPlayer', name);
+          rooms[index].jailedPlayers.push(obiect.idPlayerOnAbility);
+
+        }
+        ServerIo.to(socket.id).emit('investigatedPlayer', {
+
+          id : obiect.idPlayerOnAbility,
+          role: 'thug'
+
+        });
+      }
+      else {
+
+      for(i in rooms[index].rolesWithId){
 
       if(rooms[index].rolesWithId[i] == obiect.idPlayerOnAbility){
+
+
+        if(role == 'jailer' && mafias.find(x => x == i)){
+
+          ServerIo.to(rooms[index].code).emit('newJailedPlayer', name);
+          rooms[index].jailedPlayers.push(obiect.idPlayerOnAbility);
+
+        }
 
         ServerIo.to(socket.id).emit('investigatedPlayer', {
 
@@ -803,6 +928,12 @@ function addEventsAbility(obiect, role, socket){
 
     for(i of rooms[index].thugs){
       if(i == obiect.idPlayerOnAbility){
+
+        if(role == 'jailer'){
+          ServerIo.to(rooms[index].code).emit('newJailedPlayer', name);
+          rooms[index].jailedPlayers.push(obiect.idPlayerOnAbility);
+
+        }
         ServerIo.to(socket.id).emit('investigatedPlayer', {
 
           id : obiect.idPlayerOnAbility,
@@ -811,11 +942,67 @@ function addEventsAbility(obiect, role, socket){
         });
       }
     }
-
-
   }
+  }
+}
 
   if(rooms[index].players[obiect.indexRole].role === role && obiect.idPlayerOnAbility != 0){
+
+    if(obiect.ability == 'silence')ServerIo.to(obiect.idPlayerOnAbility).emit('abilityOnMe', 'silence');
+    if(obiect.ability == 'block')ServerIo.to(obiect.idPlayerOnAbility).emit('abilityOnMe', 'block');
+    if(obiect.ability == 'jail')ServerIo.to(obiect.idPlayerOnAbility).emit('abilityOnMe', 'jail');
+    if(obiect.ability == 'seduce')ServerIo.to(obiect.idPlayerOnAbility).emit('abilityOnMe', 'seduce');
+    if(obiect.ability == 'hypnotize')ServerIo.to(obiect.idPlayerOnAbility).emit('abilityOnMe', 'hypnotize');
+
+    if(role == 'journalist' && obiect.idPlayerOnAbility && obiect.idPlayerOnAbility1){
+      let role1, role2;
+      for(i in rooms[index].rolesWithId){
+
+        if(rooms[index].rolesWithId[i] == obiect.idPlayerOnAbility){
+          role1 = i;
+        }
+        if(rooms[index].rolesWithId[i] == obiect.idPlayerOnAbility1){
+          role2 = i;
+        }
+      }
+
+      for(i of rooms[index].bystanders){
+
+        if(i == obiect.idPlayerOnAbility){
+          role1 = 'bystander';
+        }
+
+        if(rooms[index].rolesWithId[i] == obiect.idPlayerOnAbility1){
+          role2 = 'bystander';
+        }
+
+      }
+
+      for(i of rooms[index].thugs){
+
+        if(i == obiect.idPlayerOnAbility){
+          role1 = 'thug';
+        }
+
+        if(i == obiect.idPlayerOnAbility1){
+          role2 = 'thug';
+        }
+
+      }
+
+      let mafia1 = mafias.find(x => x == role1);
+      let mafia2 = mafias.find(x => x == role2);
+
+      console.log('Im here');
+
+      if(mafia1 == mafia2){
+        ServerIo.to(socket.id).emit('researched', 'sameTeam');
+      }
+      else ServerIo.to(socket.id).emit('researched','differentTeams');
+
+
+
+    }
 
     if(!rooms[index].nightDeck[obiect.idPlayerOnAbility]){
       rooms[index].nightDeck[obiect.idPlayerOnAbility] = [rolesWithEdAbilities[obiect.ability]]; //verific daca a fost format un array []
@@ -826,7 +1013,17 @@ function addEventsAbility(obiect, role, socket){
 
   }
     rooms[index].numberOrderNight++;
-    while(!rooms[obiect.index].roles.find(x => x == order[rooms[index].numberOrderNight]) && rooms[index].numberOrderNight <= numberOrder)rooms[index].numberOrderNight++;
+    let sendHere = false;
+    while(!rooms[obiect.index].roles.find(x => x == order[rooms[index].numberOrderNight]) && rooms[index].numberOrderNight <= numberOrder){
+
+      if(order[rooms[index].numberOrderNight] == 'thug' && rooms[obiect.index].thugs.length == 0){
+        ServerIo.to(rooms[obiect.index].speaker).emit('nextRole', 'thug');
+        sendHere = true;
+        break;
+      }
+      else rooms[index].numberOrderNight++;
+
+    }
 
     //ServerIo.to(rooms[index].rolesWithId[order[rooms[index].numberOrderNight]]).emit('yourTurn');
 
@@ -839,7 +1036,11 @@ function addEventsAbility(obiect, role, socket){
       return;
     }
 
-    ServerIo.to(rooms[obiect.index].speaker).emit('nextRole', order[rooms[index].numberOrderNight]);
+    if(!sendHere)ServerIo.to(rooms[obiect.index].speaker).emit('nextRole', order[rooms[index].numberOrderNight]);
 
 
 }
+ catch(err){}
+  }
+}}
+

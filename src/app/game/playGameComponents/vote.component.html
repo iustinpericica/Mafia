@@ -1,10 +1,14 @@
 <p *ngFor = "let i of playersVotes"><span *ngIf = "!i.dead && !i.speaker && i.id != myPlayer.id">{{i.name}} is trying to vote {{i.vote}}</span></p>
 
-<p>You are voting {{voteTargetName}}</p>
+<div *ngIf = "!playGameService.iAmJailed && !playGameService.iAmSilenced && !playGameService.iAmHypnotised">
+  <p>You are voting {{voteTargetName}}</p>
+  <h2>Alive players</h2>
+  <p *ngFor = "let player of alivePlayers">{{player.name}}
 
-<h2>Alive players</h2>
-<p *ngFor = "let player of alivePlayers">{{player.name}}
+    <button (click) = "changeVote(player.id, player.name)">Vote</button>
 
-   <button (click) = "changeVote(player.id, player.name)">Vote</button>
+  </p>
+</div>
 
-</p>
+
+{{timer}}

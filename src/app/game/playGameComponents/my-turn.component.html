@@ -1,6 +1,21 @@
+<div *ngIf = "!playGameService.iAmSeduced && !playGameService.iAmBlocked && !playGameService.iAmJailed && playGameService.gameService.myPlayer?.role != 'journalist' ">
 
-<button [disabled] = "!onClickAbility" *ngFor = "let player of alivePlayers" (click) = "sendAbility(player.id)">{{player.name}}</button>
+  <button [disabled] = "!onClickAbility" *ngFor = "let player of alivePlayers" (click) = "sendAbility(player.id)">{{player.name}}</button>
 
 
-<button *ngFor = "let i of playGameService.gameService.myPlayer?.abilities" (click) = "onClickAbility = true; abilityChosen = i">{{i}}</button>
+  <button *ngFor = "let i of playGameService.gameService.myPlayer?.abilities" (click) = "onClickAbility = true; abilityChosen = i">{{i}}</button>
 
+</div>
+
+<div *ngIf = "!playGameService.iAmSeduced && !playGameService.iAmBlocked && !playGameService.iAmJailed && playGameService.gameService.myPlayer?.role == 'journalist' ">
+
+    <button  *ngFor = "let player of alivePlayers" (click) = "changeAbilityJournalist(player.id, player.name)">{{player.name}}</button>
+
+    <p>Chosen players {{name1}}, {{name2}}</p>
+
+    <button *ngFor = "let i of playGameService.gameService.myPlayer?.abilities" [disabled] = "id1 && id2">{{i}}</button>
+
+</div>
+
+
+Time left {{timer}}

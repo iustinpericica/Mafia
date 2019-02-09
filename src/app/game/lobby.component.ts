@@ -11,7 +11,7 @@ export class LobbyComponent implements OnInit {
 
   public socket;
 
-  constructor(private gameService:GameService, private toastrService:ToastrService) { }
+  constructor(public gameService:GameService, private toastrService:ToastrService) { }
 
   ngOnInit() {
 

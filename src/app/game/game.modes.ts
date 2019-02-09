@@ -121,7 +121,7 @@ export let groups = {
     specialists:['nurse', 'bodyguard', 'vixen', 'hypnotist', 'journalist'],
     leaders:['jailer', 'priest', 'detective', 'judge', 'sheriff'],
     thugs:[],
-    mobsters:['thief', 'godfather', 'lawyer', 'snitch', 'impostor']
+    mobsters:['thief', 'godfather', 'lawyer', 'snitch']
 
 }
 

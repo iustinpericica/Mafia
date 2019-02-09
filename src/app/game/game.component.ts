@@ -25,7 +25,7 @@ export class GameComponent implements OnInit {
         case 'nurse':this.gameComponentMother.gameService.myPlayer.abilities = ['save'];break;
         case 'bodyguard': this.gameComponentMother.gameService.myPlayer.abilities = ['protect'];break;
         case 'thug' : this.gameComponentMother.gameService.myPlayer.abilities = ['kill'];break;
-        case 'jailer' : this.gameComponentMother.gameService.myPlayer.abilities = ['jail'];break;
+        case 'jailer' : this.gameComponentMother.gameService.myPlayer.abilities = ['investigate'];break;
         case 'priest' : this.gameComponentMother.gameService.myPlayer.abilities = ['kill', 'investigate'];break;
         case 'detective' : this.gameComponentMother.gameService.myPlayer.abilities = ['kill', 'investigate'];break;
         case 'judge' : this.gameComponentMother.gameService.myPlayer.abilities = ['investigate'];break;

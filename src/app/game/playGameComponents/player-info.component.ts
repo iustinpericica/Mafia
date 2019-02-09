@@ -1,4 +1,5 @@
 import { Component, OnInit, Input } from '@angular/core';
+import { PlayGameService } from '../playGame.service';
 
 @Component({
   selector: 'app-player-info',
@@ -11,7 +12,7 @@ export class PlayerInfoComponent implements OnInit {
   @Input() alivePlayers;
   @Input() code;
 
-  constructor() { }
+  constructor(public playGameService:PlayGameService) { }
 
   ngOnInit() {
   }

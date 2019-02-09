@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, assertPlatform } from '@angular/core';
 import { GameService } from './game.service';
 import { PlayGameService } from './playGame.service';
 
@@ -29,6 +29,7 @@ export class PlayGameComponent implements OnInit {
   public diedPlayers = [];
   public speakerPlayers = [];
   public myTurn:boolean = false;
+
 
   ngOnInit() {
     this.code = this.playGameService.gameService.code;
@@ -79,16 +80,55 @@ export class PlayGameComponent implements OnInit {
 
     }
 
+    this.playGameService.gameService.socket.on('investigatedByPriest', (nameOfThePriest)=>{
+
+        alert(`You have been investigated by priest, the priest is ${nameOfThePriest}`);
+
+    });
+
+
+    this.playGameService.gameService.socket.on('researched', (sameTeam)=>{
+
+      alert(`The players you have investigated are on ${sameTeam}`);
+
+  });
+
+
+    this.playGameService.gameService.socket.on('abilityOnMe', (ability)=>{
+
+      switch(ability){
+        case 'silence':this.playGameService.iAmSilenced = true;break;
+        case 'block': this.playGameService.iAmBlocked = true;break;
+        case 'jail': this.playGameService.iAmJailed = true;break;
+        case 'seduce': this.playGameService.iAmSeduced = true;break;
+        case 'hypnotize': this.playGameService.iAmHypnotised = true;break;
+        default:break;
+      }
+
+    })
+
     this.playGameService.gameService.socket.on('changeVoteServer', (obiect)=>{
 
       this.playersVotes[obiect.vectorId].vote = obiect.name;
 
     });
 
+    this.playGameService.gameService.socket.on('newJailedPlayer', (name)=>{
+      if(name == this.playGameService.gameService.myPlayer.name){
+        this.playGameService.iAmJailed = true;
+      }
+      this.playGameService.jailedPlayers.push(name);
+    });
+
+    this.playGameService.gameService.socket.on('freeJailedPlayers', ()=>{
+      this.playGameService.jailedPlayers = [];
+    });
+
     this.playGameService.gameService.socket.on('gameEndedMafia', (players) => {
 
         this.players = players;
         this.mafiaWin = true;
+        this.playGameService.gameEnd = true;
 
     });
 
@@ -96,6 +136,7 @@ export class PlayGameComponent implements OnInit {
 
       this.players = players;
       this.civiliansWin = true;
+      this.playGameService.gameEnd = true;
 
   });
 
@@ -123,6 +164,7 @@ export class PlayGameComponent implements OnInit {
 
 
   }
+
 
   makeDead(id):void{
 

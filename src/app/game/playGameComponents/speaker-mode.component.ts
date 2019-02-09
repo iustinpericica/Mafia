@@ -19,7 +19,14 @@ export class SpeakerModeComponent implements OnInit {
     this.playGameService.gameService.socket.on('nextRole', (role)=>{
 
       this.playGameService.nextMove = role;
+      if(role == 'newNight'){
 
+        this.playGameService.iAmBlocked = false;
+        this.playGameService.iAmHypnotised = false;
+        this.playGameService.iAmSeduced = false;
+        this.playGameService.iAmSilenced = false;
+
+      }
     });
 
   }

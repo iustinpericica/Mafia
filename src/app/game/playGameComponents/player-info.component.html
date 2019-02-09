@@ -6,3 +6,12 @@
 <h3 *ngIf = "myPlayer.died" style="color:red">You are dead</h3>
 
 <p *ngFor = "let player of alivePlayers">{{player.name}}</p>
+
+<div *ngIf = "playGameService.jailedPlayers.length > 0">
+  <h2>Jailed players:</h2>
+  <p *ngFor = "let jailed of playGameService.jailedPlayers">{{jailed}}</p>
+</div>
+
+<p *ngIf = "playGameService.iAmSeduced">You are seduced</p>
+<p *ngIf = "playGameService.iAmBlocked">You are blocked</p>
+<p *ngIf = "playGameService.iAmJailed">You are jailed</p>

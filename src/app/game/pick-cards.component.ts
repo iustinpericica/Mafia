@@ -15,14 +15,13 @@ export class PickCardsComponent implements OnInit {
   public genericDeck;
   public groups = groups;
   public descriptions = descriptions;
-  public currentCategory:string;
+  public currentCategory:string = "specialists";
 
   ngOnInit() {
 
     this.selectionService.gameService.socket.component = this;
 
     this.genericDeck = this.selectionService.genericDeck;;
-    this.currentCategory =  "bystanders";;
     this.selectionService.Deck.bystanders = this.genericDeck.bystanders;
     this.selectionService.Deck.thugs = this.genericDeck.thugs;
 
