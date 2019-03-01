@@ -1,22 +1,37 @@
+<div class="box">
+
+  <p class="textPrincipal">You are the speaker, {{playGameService.gameService.myPlayer.name}}</p>
+
+</div>
+
 <div>
 
-    <h2>You are the speaker</h2>
+    <p class="textSecundar"><button class=" btn btn-outline-info textSecundar" (click) = "callNextMove()" [disabled] = "playGameService.gameEnd">Next move</button> </p>
+    <p class="textSecundar">
+      <button class="btn btn-primary textSecundar" type="button" data-toggle="collapse" data-target="#collapseExample4" aria-expanded="false" aria-controls="collapseExample">
+        The next move is going to be: {{playGameService.nextMove}}
+      </button>
+    </p>
 
-    <button (click) = "playGameService.callNextMove()" [disabled] = "playGameService.gameEnd">Next move</button>
-    <p> The next move is going to be: {{playGameService.nextMove}}</p>
+    <div class="collapse" id="collapseExample4">
+        <div class="card card-body textSecundar">
+            {{events[playGameService.nextMove]}}
+        </div>
+     </div>
 
 </div>
 
 
 <div>
 
-  <h2>All players:</h2>
-  <p *ngFor = "let player of speakerPlayers">{{player.name}}, role is: {{player.role}}</p>
+  <p class="textPrincipal">All players:</p>
 
-  <h2>Alive players:</h2>
-  <p *ngFor = "let player of alivePlayers">{{player.name}}</p>
+  <p *ngFor = "let player of speakerPlayers" class="textSecundar">{{player.name}}<span class="badge" [ngClass] = "{'badge-danger' : checkInMobsters(player.role), 'badge-success' : !checkInMobsters(player.role) }">{{player.role}}</span></p>
 
-  <h2>Dead players</h2>
-  <p *ngFor = "let player of diedPlayers">{{player.name}}</p>
+  <p class="textPrincipal text-success" >Alive players:</p>
+  <p *ngFor = "let player of alivePlayers" class="textSecundar">{{player.name}}</p>
+
+  <p class="textPrincipal text-danger" >Dead players</p>
+  <p *ngFor = "let player of diedPlayers" class="textSecundar">{{player.name}}</p>
 
 </div>

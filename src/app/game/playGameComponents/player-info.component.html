@@ -1,17 +1,107 @@
-<h2>Your name is : {{myPlayer.name}} </h2>
-<h2>Your room code is : {{code}} </h2>
-<h2>Your role is : {{myPlayer.role}} </h2>
-<h2>Your vector id is: {{myPlayer.vectorId}}</h2>
 
-<h3 *ngIf = "myPlayer.died" style="color:red">You are dead</h3>
+<p class="textPrincipal">Hi again {{myPlayer.name}}, or should i call you {{myPlayer.role}}</p>
 
-<p *ngFor = "let player of alivePlayers">{{player.name}}</p>
+<p class="textPrincipal text-info">
+    <button class="btn btn-primary textSecundar" type="button" data-toggle="collapse" data-target="#collapseExample9" aria-expanded="false" aria-controls="collapseExample">
+    <p class="textPrincipal">
 
-<div *ngIf = "playGameService.jailedPlayers.length > 0">
-  <h2>Jailed players:</h2>
-  <p *ngFor = "let jailed of playGameService.jailedPlayers">{{jailed}}</p>
+      Your role is : {{myPlayer.role}}
+
+    </p>
+    </button>
+</p>
+
+    <div class="collapse" id="collapseExample9">
+        <div class="card card-body textSecundar">
+            {{events[myPlayer.role]}}
+        </div>
+    </div>
+
+<p class="textSecundar">Your room code is : {{code}} </p>
+
+<p class="textPrincipal text-danger" *ngIf = "myPlayer.died">We are so sorry, you have died..</p>
+
+<div *ngIf = "playGameService.iAmSeduced">
+
+  <p class="textSecundar text-info">
+      <button class="btn btn-primary textSecundar" type="button" data-toggle="collapse" data-target="#collapseExample6" aria-expanded="false" aria-controls="collapseExample">
+        You are seduced, you can not use your ability
+      </button>
+  </p>
+
+      <div class="collapse" id="collapseExample6">
+          <div class="card card-body textSecundar text-danger">
+              The Vixen may seduce a player. The seduced player cannot
+              use his ability that night, but he also cannot be killed.
+              The facilitator calls on the seduced player as usual
+              but does not allow him to use his ability; instead, the
+              facilitator holds up a hand to demonstrate the player has
+              been blocked. If the Vixen seduces the only Mafia player
+              remaining in the game, the Mafia does not kill anyone that night.
+          </div>
+      </div>
+
 </div>
 
-<p *ngIf = "playGameService.iAmSeduced">You are seduced</p>
-<p *ngIf = "playGameService.iAmBlocked">You are blocked</p>
-<p *ngIf = "playGameService.iAmJailed">You are jailed</p>
+<div *ngIf = "playGameService.iAmBlocked">
+
+    <p class="textSecundar text-info">
+        <button class="btn btn-primary textSecundar" type="button" data-toggle="collapse" data-target="#collapseExample7" aria-expanded="false" aria-controls="collapseExample">
+            You are blocked, you can not use your ability
+        </button>
+    </p>
+
+        <div class="collapse" id="collapseExample7">
+            <div class="card card-body textSecundar text-danger">
+                The Thief may block a player. The blocked player cannot
+use his ability that night. The facilitator calls on the
+blocked player as usual but does not allow him to use
+his ability; instead, the facilitator holds up a hand to
+demonstrate the player has been blocked.
+            </div>
+         </div>
+
+  </div>
+
+
+  <div *ngIf = "playGameService.iAmJailed">
+
+      <p class="textSecundar text-info">
+          <button class="btn btn-primary textSecundar" type="button" data-toggle="collapse" data-target="#collapseExample8" aria-expanded="false" aria-controls="collapseExample">
+              You are jailed, you can not use your ability
+          </button>
+      </p>
+
+          <div class="collapse" id="collapseExample8">
+              <div class="card card-body textSecundar text-danger">
+                  The Jailer may investigate a player; if the investigated player
+                  is in the Mafia, he is immediately put in jail. Jailed players
+                  cannot use their abilities, participate in Mafia killings, or
+                  vote during the day, but they can participate in discussions.
+                  At dawn, the facilitator announces the identity of the player
+                  in jail, as well as any previously jailed players. If the Jailer is
+                  eliminated, all jailed players are set free and can once again
+                  use their abilities.
+                  <br />
+                  Warning: If there is a SNITCH, you have been tricked.
+              </div>
+           </div>
+
+    </div>
+
+<p class="textPrincipal text-info"> Alive players: </p>
+
+<p *ngFor = "let player of alivePlayers" class="textSecundar">{{player.name}}</p>
+
+<div *ngIf = "playGameService.jailedPlayers.length > 0">
+
+     <p class="textSecundar">Jailed players:</p>
+
+        <p *ngFor = "let jailed of playGameService.jailedPlayers" class="textSecundar" >
+
+          {{jailed}}
+
+        </p>
+</div>
+
+

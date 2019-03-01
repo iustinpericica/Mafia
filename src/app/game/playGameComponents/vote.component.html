@@ -1,14 +1,24 @@
-<p *ngFor = "let i of playersVotes"><span *ngIf = "!i.dead && !i.speaker && i.id != myPlayer.id">{{i.name}} is trying to vote {{i.vote}}</span></p>
+<p *ngFor = "let i of playersVotes" class="textSecundar text-info">
+
+  <span *ngIf = "!i.dead && !i.speaker && i.id != myPlayer.id">{{i.name}} is trying to vote {{i.vote}}</span>
+
+</p>
 
 <div *ngIf = "!playGameService.iAmJailed && !playGameService.iAmSilenced && !playGameService.iAmHypnotised">
-  <p>You are voting {{voteTargetName}}</p>
-  <h2>Alive players</h2>
-  <p *ngFor = "let player of alivePlayers">{{player.name}}
 
-    <button (click) = "changeVote(player.id, player.name)">Vote</button>
+  <p class="textPrincipal text-dark" >You are voting {{voteTargetName}}</p>
+
+  <p class="textPrincipal"> Vote a player </p>
+
+  <p *ngFor = "let player of alivePlayers" class="textSecundar" >
+
+    <span>
+      {{player.name}} <button (click) = "changeVote(player.id, player.name)">Vote</button>
+    </span>
 
   </p>
+
 </div>
 
 
-{{timer}}
+<p class="textPrincipal">Time left: <b>{{timer}}</b></p>

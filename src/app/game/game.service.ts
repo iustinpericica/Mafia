@@ -43,7 +43,7 @@ export class GameService implements OnInit{
   }
 
   init():void{
-    this.socket = io('localhost:3000');
+    this.socket = io('https://mafiagame1.herokuapp.com');
 
   }
 

@@ -25,6 +25,14 @@ export class MyTurnComponent implements OnInit {
 
   ngOnInit() {
 
+
+    if(this.playGameService.gameService.myPlayer.abilities.length <= 1){
+
+      this.onClickAbility = true;
+      this.abilityChosen = this.playGameService.gameService.myPlayer.abilities[0];
+
+    }
+
     const numbers = timer(0, 1000);
     numbers.subscribe(x => {
       if(x > 7)x = 0;

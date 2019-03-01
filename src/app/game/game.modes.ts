@@ -125,6 +125,80 @@ export let groups = {
 
 }
 
+export let events = {
+  newNight : "Players may use their abilities and the Mafia chooses a victim. ",
+  endNight: "All players will be announced what transpired during the night",
+  voteTimeStart : " Players vote to determine which player to kill. If 2 or more players have the maximum votes, nobody dies ",
+  jailer:`The Jailer may investigate a player; if the investigated player
+  is in the Mafia, he is immediately put in jail. Jailed players
+  cannot use their abilities, participate in Mafia killings, or
+  vote during the day, but they can participate in discussions.
+  At dawn, the facilitator announces the identity of the player
+  in jail, as well as any previously jailed players. If the Jailer is
+  eliminated, all jailed players are set free and can once again
+  use their abilities. `,
+  priest:`The Priest may either kill or investigate a player. If the he
+  investigates, the facilitator taps the investigated player to
+  awaken him; the investigated player opens his eyes to learn
+  the identity of the Priest, then closes his eyes again.`,
+  detective:`The Detective may either kill or investigate a player.`,
+  judge:`The Judge may investigate a player. During the day, the
+  Judge’s vote counts as two votes. The facilitator adds the
+  extra vote to the tally, but does not reveal the identity of
+  the Judge.`,
+  vixen:`The Vixen may seduce a player. The seduced player cannot
+  use his ability that night, but he also cannot be killed.
+  The facilitator calls on the seduced player as usual
+  but does not allow him to use his ability; instead, the
+  facilitator holds up a hand to demonstrate the player has
+  been blocked. If the Vixen seduces the only Mafia player
+  remaining in the game, the Mafia does not kill anyone that night.`
+  ,
+  hypnotist:`The Hypnotist may hypnotize another player. During the
+  following daytime vote, the hypnotized player must vote
+  the same way as the Hypnotist. When the votes are counted,
+  the facilitator tells the chosen player that he is hypnotized
+  and toward whom his vote is counted. The facilitator does not
+  reveal the identity of the Hypnotist.
+  `,
+  journalist:`The Journalist may research two players by pointing at
+  them simultaneously. If the two researched players are on
+  the same team, the facilitator nods. If they are on opposing
+  teams, the facilitator shakes his head.
+  `,
+  sheriff:`The Sheriff may kill a player.`,
+  nurse:`The Nurse may protect a player. If the protected player is
+  killed during that night, he stays alive instead, and is not
+  named among the victims at dawn. The killer does not learn
+  that his target was protected, nor is the protected player told
+  there was an attempt on his life.`,
+  bodyguard:`The Bodyguard may protect a player. If the protected
+  player is killed during that night, he stays alive, and the
+  Bodyguard is killed instead. The killer does not learn that
+  his target was protected, nor is the protected player told
+  there was an attempt on his life.`,
+  thief:`The Thief may block a player. The blocked player cannot
+  use his ability that night. The facilitator calls on the
+  blocked player as usual but does not allow him to use
+  his ability; instead, the facilitator holds up a hand to
+  demonstrate the player has been blocked.`,
+  godfather:`The Godfather may silence a player. The silenced player
+  cannot vote during the next day’s killing. At dawn, the
+  facilitator announces the name of the silenced player. That
+  player can still participate in the daytime discussion and
+  become a suspect; however, he cannot raise his hand to vote.`,
+  lawyer:`The Lawyer may investigate a player; the facilitator shows
+  the investigated player’s facilitator card to the Lawyer. `,
+  snitch:`The Snitch may badmouth a player. If the badmouthed
+  player’s identity is investigated that night, the facilitator
+  shows a Mafia Thugs facilitator card instead of the player’s
+  actual facilitator card. The Snitch works best in games with
+  roles that have the investigate ability.`,
+  thug:` While all the other players have their eyes
+  closed, the Mafia players open their eyes and silently choose a player to kill. `
+
+}
+
 export let descriptions = {
   bystanders: `Bystanderss are common roles, with no abilities. Most civilian
   players in a game will be Bystanderss.`,

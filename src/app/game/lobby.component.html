@@ -1,16 +1,22 @@
-<p style="width:100%;font-size: 6vw;text-align: center;">Your room code is {{gameService.code}}</p>
-<p style="width:100%;font-size: 6vw;text-align: center;">Hi there {{gameService.myPlayer.name}}</p>
+
+<div class="box">
+
+  <p class="textPrincipal text animated bounce">Hi there {{gameService.myPlayer.name}}</p>
+
+</div>
+
+<p class="textPrincipal">Your room code is <b>{{gameService.code}}</b></p>
 
 <div style="width:100%;align-content:center;text-align:center">
 
   <div class="bg-gradient-info" *ngIf = "gameService.myPlayer.admin && !gameService.myPlayer.speaker">
 
-    <h4 class="text-info" >You have to choose a speaker</h4> <button class="btn btn-primary" style="font-size:5vw;" type="button" data-toggle="collapse" data-target="#collapseExample" aria-expanded="false" aria-controls="collapseExample">
-        What this means?
-      </button>
+    <p class="text-info textSecundar" ><button class="btn btn-primary textSecundar" type="button" data-toggle="collapse" data-target="#collapseExample" aria-expanded="false" aria-controls="collapseExample">
+      You have to choose a speaker
+      </button> </p>
 
       <div class="collapse" id="collapseExample">
-          <div class="card card-body" style="font-size:4vw;">
+          <div class="card card-body textSecundar">
             The speaker is the person that on thw whole game is going to be the tailer.
           </div>
        </div>
@@ -18,47 +24,45 @@
 
   </div>
 
-  <h4 class="text-info" style="width:100%;">Players:</h4>
+  <p class="text-info textPrincipal" >Players:</p>
 
-  <p *ngFor = "let player of gameService.players" style="font-size:4vw;" >{{player.name}}
+  <p *ngFor = "let player of gameService.players" class="textSecundar" >{{player.name}}
 
-      <span class="badge badge-dark" *ngIf = "player.admin">Admin</span>
+      <span class="badge badge-info" *ngIf = "player.admin">Admin</span>
       <span class="badge badge-warning" *ngIf = "player.speaker">Speaker</span>
-      <button *ngIf = "gameService.myPlayer.admin && !gameService.myPlayer.speaker" class="btn btn-outline-warning" (click) = "sendSpeaker(player.id)">Make speaker</button>
+      <button *ngIf = "gameService.myPlayer.admin && !gameService.myPlayer.speaker" class="btn btn-outline-warning textSecundar" (click) = "sendSpeaker(player.id)">Make speaker</button>
 
   </p>
 
 
 
-  <p style="width:100%;font-size:6vw;">Number of players: {{gameService.players.length}}</p>
+  <p class="textPrincipal">Number of players: {{gameService.players.length}}</p>
 
-  <p style="width:100%;font-size:6vw;">Number of players that will play: {{gameService.players.length - 1}}</p>
-
-    <button class="btn btn-primary" style="font-size:5vw;" type="button" data-toggle="collapse" data-target="#collapseExample1" aria-expanded="false" aria-controls="collapseExample">
-      Why?
-    </button>
+  <p class="textPrincipal"><button class="btn btn-primary textSecundar" type="button" data-toggle="collapse" data-target="#collapseExample1" aria-expanded="false" aria-controls="collapseExample">
+    Number of players that will play: {{gameService.players.length - 1}}
+  </button></p>
 
     <div class="collapse" id="collapseExample1">
-        <div class="card card-body" style="font-size:4vw;">
+        <div class="card card-body textSecundar" >
           That's because 1 player is the speaker(the tailer). <br />
           The speaker is the person that is going to control the game.
         </div>
      </div>
 
-  <p class="text-danger" style="font-size:4vw;" *ngIf = "gameService.players.length < 5">It is highly reccomanded to have minimum 5 players for a smooth experience</p>
-  <p class="text-danger" style="font-size:4vw;" *ngIf = "gameService.players.length < 4">You can not start the game with {{gameService.players.length - 1}} players that will play </p>
+  <p class="text-danger textSecundar" *ngIf = "gameService.players.length < 5">It is highly reccomanded to have minimum 5 players for a smooth experience</p>
+  <p class="text-danger textSecundar"  *ngIf = "gameService.players.length < 4" [ngClass]="{'underLineYellow': gameService.players.length <= 3}">You can not start the game with {{gameService.players.length - 1}} players that will play </p>
 
 
   <div  *ngIf = "gameService.myPlayer.admin" >
 
-    <button class="btn btn-success" style="font-size:5vw;" (click) = "startSelection()" [disabled] = "gameService.players.length <= 3">Start selection</button>
+    <button class="btn btn-outline-warning textSecundar" (click) = "startSelection();" [disabled] = "!gameService.players.length || !3">Start selection</button>
     <br/>
-    <button class="btn btn-primary" style="font-size:5vw;" type="button" data-toggle="collapse" data-target="#collapseExample2" aria-expanded="false" aria-controls="collapseExample">
+    <button class="btn btn-primary textSecundar" type="button" data-toggle="collapse" data-target="#collapseExample2" aria-expanded="false" aria-controls="collapseExample">
         What means selection?
     </button>
 
       <div class="collapse" id="collapseExample2">
-          <div class="card card-body" style="font-size:4vw;">
+          <div class="card card-body textSecundar">
               Start selection means that the admin (you) is going to choose the cards for the game.
           </div>
       </div>

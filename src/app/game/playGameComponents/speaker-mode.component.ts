@@ -1,5 +1,6 @@
 import { Component, OnInit, Input } from '@angular/core';
 import { PlayGameService } from '../playGame.service';
+import { groups, events } from '../game.modes';
 
 @Component({
   selector: 'app-speaker-mode',
@@ -11,6 +12,10 @@ export class SpeakerModeComponent implements OnInit {
   @Input() speakerPlayers:Array<any>;
   @Input() alivePlayers;
   @Input() diedPlayers;
+
+  public groups = groups;
+  public events = events;
+
   constructor(public playGameService:PlayGameService) { }
 
   ngOnInit() {
@@ -29,6 +34,18 @@ export class SpeakerModeComponent implements OnInit {
       }
     });
 
+  }
+
+  callNextMove():void{
+    this.playGameService.gameService.toastr.suceess(`You have called with success ${this.playGameService.nextMove}`)
+    this.playGameService.callNextMove();
+  }
+
+  checkInMobsters(role){
+    if(this.groups.mobsters.find(x => x == role) || role == 'thug'){
+        return true;
+    }
+    return false;
   }
 
 }

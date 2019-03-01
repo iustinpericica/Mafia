@@ -1,14 +1,18 @@
 
 <div *ngIf = "!playGameService.iAmSeduced && !playGameService.iAmBlocked && !playGameService.iAmJailed">
 
-    <button *ngFor = "let player of alivePlayers" (click) = "changeMafiaTarget(player.id, player.name)">{{player.name}}</button>
+    <div class="textSecundar" style="align-content:center;text-align:center;">
 
-    <h2 style="color:red">Kill</h2>
-    <p>You want to kill{{mafiaKillingTargetName}}</p>
+      <button *ngFor = "let player of alivePlayers" class="text-danger" (click) = "changeMafiaTarget(player.id, player.name)">{{player.name}}</button>
+
+  </div>
+
+    <p class="textPrincipal text-danger">Kill</p>
+    <p class="textSecundar text-info">You want to kill {{mafiaKillingTargetName}}</p>
 
 </div>
 
-<p *ngFor = "let mafiot of mafias">
+<p *ngFor = "let mafiot of mafias" class="textSecundar text-info">
 
   <span *ngIf = "mafiot.voteTo">
     {{mafiot.name}} is voting to {{mafiot.voteTo}}
@@ -16,8 +20,8 @@
 
 </p>
 
-<p *ngIf = "counter == mafias?.length - 1">
+<p *ngIf = "counter == mafias?.length - 1" class="textPrincipal">
   Currently, all mafias are pointing to {{mafiaKillingTargetName}}
 </p>
 
-Time left {{timer}}
+<p class="textPrincipal">Time left <b>{{timer}}</b></p>

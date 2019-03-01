@@ -5,10 +5,14 @@ const Cors = require('cors');
 
 const PORT = process.env.PORT || 3000;
 
+App.use(Cors());
+
 App.use(Express.static(__dirname + '/Mafia'));
 
 App.get('/*', (req, res)=>{
-
+  res.set('Access-Control-Allow-Origin', '*')
+  res.set('Access-Control-Allow-Methods', 'GET, OPTIONS')
+  res.set('Access-Control-Allow-Headers', 'Content-Type')
   res.sendFile(__dirname + '/Mafia/index.html');
 
 });

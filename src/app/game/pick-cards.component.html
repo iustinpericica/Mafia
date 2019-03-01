@@ -1,12 +1,12 @@
 <div style="width:100%;align-content:center;text-align:center">
-  <h3>Welcome to pick the game cards:</h3>
+  <p class="textPrincipal">Welcome to pick the game cards:</p>
 
-  <button class="btn btn-primary" style="font-size:3vw;" type="button" data-toggle="collapse" data-target="#collapseExample2" aria-expanded="false" aria-controls="collapseExample">
+  <button class="btn btn-primary textSecundar"  type="button" data-toggle="collapse" data-target="#collapseExample2" aria-expanded="false" aria-controls="collapseExample">
     What is going here?
   </button>
 
   <div class="collapse" id="collapseExample2">
-  <div class="card card-body" style="font-size:2vw;">
+  <div class="card card-body textSecundar">
 
     There is the page where you have to pick your cards for roles with abilities.
     For example: &lt;&lt; On the previous page you established to have 2 specialists, so here you have to select from all the cards with specialists the ones that you would like &gt;&gt;
@@ -14,18 +14,18 @@
   </div>
   </div>
   <br/><br/>
-  <button class="btn btn-primary" style="font-size:3vw;" type="button" data-toggle="collapse" data-target="#collapseExample3" aria-expanded="false" aria-controls="collapseExample">
+  <button class="btn btn-primary textSecundar"  type="button" data-toggle="collapse" data-target="#collapseExample3" aria-expanded="false" aria-controls="collapseExample">
       Tips
     </button>
 
     <div class="collapse" id="collapseExample3">
-    <div class="card card-body" style="font-size:2vw;">
+    <div class="card card-body textSecundar">
 
       If your team is a begginer one you should try :<br/>
       specialists: nurse, bodyguard<br/>
       leaders: detective, sheriff, judge<br/>
 
-      <h5>Reccomanded combos</h5>
+      <p>Reccomanded combos</p>
       hypnotist + judge<br/>
       badmouth + jailer<br/>
 
@@ -33,16 +33,16 @@
     </div>
 </div>
 
-  <p>You have to pick {{selectionService.genericDeck?.leaders}} leaders</p>
-  <p>You have to pick {{selectionService.genericDeck?.specialists}} specialists</p>
-  <p>You have to pick {{selectionService.genericDeck?.mobsters}} mobsters</p>
+  <p  class="textSecundar">You have to pick {{selectionService.genericDeck?.leaders}} leaders</p>
+  <p class="textSecundar">You have to pick {{selectionService.genericDeck?.specialists}} specialists</p>
+  <p class="textSecundar">You have to pick {{selectionService.genericDeck?.mobsters}} mobsters</p>
 
-  <p>You have chosen {{selectionService.genericDeck?.thugs}} thugs</p>
-  <p>You have chosen {{selectionService.genericDeck?.bystanders}} bystanders</p>
+  <p class="textSecundar">You have chosen {{selectionService.genericDeck?.thugs}} thugs</p>
+  <p class="textSecundar">You have chosen {{selectionService.genericDeck?.bystanders}} bystanders</p>
 
-  <h3>Pick your cards:</h3>
+  <p class="textPrincipal">Pick your cards:</p>
 
-<div class="btn-group" style="width:100%;" role="group" aria-label="Basic example">
+<div class="btn-group textSecundar" style="width:100%;" role="group" aria-label="Basic example">
 
     <button type="button" (click) = "changePickingCards('leaders')" class="btn btn-secondary">Leaders</button>
     <button type="button" (click) = "changePickingCards('specialists')" class="btn btn-secondary">Specialits</button>
@@ -54,8 +54,8 @@
 
 <div>
 
-  <p>You have to pick {{genericDeck[currentCategory]}} {{currentCategory}}</p>
-  <p>You have picked {{selectionService.Deck[currentCategory].length}}</p>
+  <p  class="textSecundar">You have to pick {{genericDeck[currentCategory]}} {{currentCategory}}</p>
+  <p class="textSecundar">You have picked {{selectionService.Deck[currentCategory].length}}</p>
 
   <div *ngIf = "selectionService.Deck[currentCategory].length > 0"><p *ngFor = "let chosenCard of selectionService.Deck[currentCategory]">{{chosenCard}}</p></div>
   <div class="row" style="align-content:center;text-align:center;">
